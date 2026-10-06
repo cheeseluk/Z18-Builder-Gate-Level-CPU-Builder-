@@ -2,7 +2,9 @@
 
 **A visual CPU builder: wire up gates, MUXes, registers and RAM into the 18-100 Z18100 lecture machine, then run real programs and watch every signal propagate.**
 
-![The lecture machine running a program wave by wave](ZBuilder18%20Media/hero-run.gif)
+[![The lecture machine running a program wave by wave](ZBuilder18%20Media/hero-run-crop.gif)](ZBuilder18%20Media/hero-run.gif)
+
+<sub>The demos were recorded at 4K: click any image or GIF to see it at full resolution.</sub>
 
 ---
 
@@ -14,7 +16,7 @@ From logic gates up to PC, IR and RAM. Wires drawn without bends are routed auto
 
 ![Build mode: a full adder in progress, with one net lit up and the wiring warnings below](ZBuilder18%20Media/build-mode.png)
 
-![Wiring parts and letting the router find a path](ZBuilder18%20Media/wiring.gif)
+[![Wiring parts and letting the router find a path](ZBuilder18%20Media/wiring-crop.gif)](ZBuilder18%20Media/wiring.gif)
 
 <sub>[Longer version of the wiring demo](ZBuilder18%20Media/wiring%20%28long%20version%29.gif)</sub>
 
@@ -22,7 +24,7 @@ From logic gates up to PC, IR and RAM. Wires drawn without bends are routed auto
 
 Select some parts and press `p` to turn them into one part; wires crossing the edge become its pins. Open any built-in (`Enter`) to see how it is made, from the ALU down to its full adders.
 
-![Packing gates into a reusable part, then looking inside it](ZBuilder18%20Media/pack-part.gif)
+[![Packing gates into a reusable part, then looking inside it](ZBuilder18%20Media/pack-part-crop.gif)](ZBuilder18%20Media/pack-part.gif)
 
 ### Run programs
 
