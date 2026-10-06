@@ -8,11 +8,9 @@
 
 ## What you can do
 
-- **Place and wire parts**, from logic gates up to PC, IR and RAM. Wires drawn without bends are routed automatically by an A\* router, and **Tidy** (`w`) reroutes a messy selection, or the whole level, in one undo step.
-- **Pack your circuits into reusable parts** (`p`), and open any built-in to see how it is made, from the ALU down to its full adders.
-- **Run programs** with a speed dial (0.05×–7×) and wave-by-wave animation. Step one wave, one clock phase or one instruction, or run to the end, and step back a phase at any time.
-- **15 guided missions** in three groups: basic parts (full adder up to the ALU, decoder and MUX), then memory (SR latch, D latch, D flip-flop, register), then the full machine (fetch, loads, MUX/DEMUX, store, jump).
-- **Truth and step tables**, plus error messages that explain *why* something is wrong and *how* to fix it ("R2.d comes from the data bus ... M[5] was never set").
+### Place and wire parts
+
+From logic gates up to PC, IR and RAM. Wires drawn without bends are routed automatically by an A\* router, and **Tidy** (`w`) reroutes a messy selection, or the whole level, in one undo step. Hover a wire to light up its whole net; the warnings below the canvas list anything left floating.
 
 ![Build mode: a full adder in progress, with one net lit up and the wiring warnings below](ZBuilder18%20Media/build-mode.png)
 
@@ -20,9 +18,25 @@
 
 <sub>[Longer version of the wiring demo](ZBuilder18%20Media/wiring%20%28long%20version%29.gif)</sub>
 
+### Pack circuits into reusable parts
+
+Select some parts and press `p` to turn them into one part; wires crossing the edge become its pins. Open any built-in (`Enter`) to see how it is made, from the ALU down to its full adders.
+
 ![Packing gates into a reusable part, then looking inside it](ZBuilder18%20Media/pack-part.gif)
 
+### Run programs
+
+A speed dial (0.05×–7×) and wave-by-wave animation, as in the GIF at the top. Step one wave, one clock phase or one instruction, or run to the end, and step back a phase at any time.
+
+### Check your work with truth and step tables
+
+Every input row in textbook order, with an *expected* column that marks wrong cells. Error messages explain *why* something is wrong and *how* to fix it ("R2.d comes from the data bus ... M[5] was never set").
+
 ![A truth table: every input row, checked against what the part should output](ZBuilder18%20Media/truth-table.gif)
+
+### Follow 15 guided missions
+
+Three groups: basic parts (full adder up to the ALU, decoder and MUX), then memory (SR latch, D latch, D flip-flop, register), then the full machine (fetch, loads, MUX/DEMUX, store, jump).
 
 ![The mission picker: parts, memory and machine missions](ZBuilder18%20Media/placeholder.png)
 
@@ -74,6 +88,8 @@ flowchart LR
 Developed and tested on **Python 3.14** with **cmu-graphics 2.0**.
 
 ```
+git clone https://github.com/cheeseluk/Z18-Builder-Gate-Level-CPU-Builder-.git
+cd Z18-Builder-Gate-Level-CPU-Builder-
 pip install cmu-graphics
 python z18builder/zb_main.py
 ```
