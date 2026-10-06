@@ -1,0 +1,28 @@
+# Self-modifying code: in a von Neumann machine, instructions are data.
+#
+# Address 9 starts out uninitialized (xxxxxxxx). If the program reached
+# it as is, the machine would halt. Instead the program BUILDS an
+# instruction there by adding two numbers:
+#
+#   0010 0000   (32: the op code for "Load R2")
+# + 0000 1111   (15: the address M15)
+# = 0010 1111   = "Load R2, M15"
+#
+# stores it at address 9, and then runs straight into it. Watch M9 change
+# in the RAM table, then get fetched into the IR.
+
+0:  Load R1, M13              # R1 = 0010 0000
+    Load R2, M14              # R2 = 0000 1111
+    MUX R1                    # MUX reg = R1
+    DEMUX A                   # A = 0010 0000
+    MUX R2                    # MUX reg = R2
+    DEMUX B                   # B = 0000 1111
+    Add                       # Output = 0010 1111
+    Move R0, Output           # R0 = 0010 1111
+8:  Store M9, R0              # M9 = 0010 1111: a new instruction
+9:  xxxxxxxx                  # becomes "Load R2, M15" -> R2 = 42
+                              # then M10 is uninitialized: halt
+
+13: 0010 0000                 # an op code, stored as data
+14: data 15                   # an address, stored as data
+15: data 42                   # what the new instruction loads

@@ -1,0 +1,20 @@
+# Sub, Move and Store: R0 <- A - B, then M14 <- R0 (mission 13)
+Load R2, M12
+Load R3, M13
+MUX R3
+DEMUX A           # A = 9
+MUX R2
+DEMUX B           # B = 4
+Sub               # Output = 5
+Move R0, Output
+Store M14, R0
+Add               # Output = 13
+Move R0, Output
+Store M15, R0     # (the code fills 0-11 and the data 12-15, so there is
+                  # no room for a halt word: the data runs as Move R0,
+                  # Output and the machine halts when the PC passes 15)
+
+12: data 4
+data 9
+data 0
+data 0

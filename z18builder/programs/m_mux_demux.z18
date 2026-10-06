@@ -1,0 +1,13 @@
+# MUX and DEMUX: a register into the MUX reg, then into A or B (mission 12)
+Load R1, M12
+Load R3, M13
+MUX R1            # MUX reg <- R1 (select 3)
+DEMUX A           # A <- MUX reg
+MUX R3            # MUX reg <- R3 (select 1)
+DEMUX B           # B <- MUX reg
+MUX 0             # D0 is not connected: MUX reg <- 0
+DEMUX A
+xxxxxxxx
+
+12: data 9
+data 4

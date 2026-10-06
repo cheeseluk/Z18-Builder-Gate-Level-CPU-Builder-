@@ -1,0 +1,23 @@
+# A bug: reading memory that was never set.
+#
+# The program means to compute a - b, but the second Load has a typo:
+# it reads M12 instead of M13. M12 was never set, so it holds xxxxxxxx.
+# The memory drives that unknown value onto the data bus, and R2 would
+# load it, so the simulator stops with an error on the clock edge.
+#
+# Fix it: change M12 to M13 on line 2 (then the program halts cleanly on
+# the xxxxxxxx at address 9, with 20 - 7 = 13 stored in M15).
+
+0:  Load R1, M14              # R1 = a = 20
+    Load R2, M12              # BUG: should be M13
+    MUX R1
+    DEMUX A                   # A = a
+    MUX R2
+    DEMUX B                   # B = b
+    Sub                       # Output = a - b
+    Move R0, Output
+    Store M15, R0
+
+13: data 7                    # b
+14: data 20                   # a
+15: data 0                    # result

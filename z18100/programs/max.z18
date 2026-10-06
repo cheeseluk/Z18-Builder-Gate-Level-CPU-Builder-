@@ -1,0 +1,34 @@
+# max(a, b): an if/else with one conditional jump.
+#
+#   if a - b >= 0:  A = a
+#   else:           A = b
+#   result = A + 0
+#
+# Try both branches: with a = 6, b = 11 the jump is NOT taken (N = 1) and
+# the else line runs. Change M14 to 11 and M15 to 6 and it IS taken.
+#
+# R0 can only be loaded from the ALU Output, so the answer is copied
+# through the ALU as A + 0 (MUX 0 gives the 0).
+#
+# There is no room left for a halt word, so after the Store the PC runs
+# into the data. 6 is 0000 0110, which decodes as "Move R0, Output": the
+# data executes as code! Here it is harmless (R0 already equals Output).
+# Then the PC runs past 15 and the machine halts.
+
+0:  Load R1, M14              # R1 = a
+    Load R2, M15              # R2 = b
+    MUX R1                    # MUX reg = a (select 3 -> R1)
+    DEMUX A                   # A = a
+    MUX R2                    # MUX reg = b (select 2 -> R2)
+    DEMUX B                   # B = b
+    Sub                       # Output = a - b, sets N
+    Jump-if-not-negative M9   # a >= b: keep A = a, skip the else
+8:  DEMUX A                   # else: A = b (the MUX reg still holds b)
+9:  MUX 0                     # MUX reg = 0
+    DEMUX B                   # B = 0
+    Add                       # Output = A + 0 = max
+    Move R0, Output           # R0 = max
+13: Store M15, R0             # M15 = max (b was already used)
+
+14: data 6                    # a
+15: data 11                   # b

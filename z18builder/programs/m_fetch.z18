@@ -1,0 +1,13 @@
+# Fetch only: the PC walks through memory and each word lands in the IR
+# (For mission 10. The loads do nothing yet on a fetch-only machine; the
+# IR and PC must still match the lecture's on every phase.)
+Load R1, M12
+Load R2, M13
+Load R3, M14
+Load R1, M15
+xxxxxxxx          # halt here
+
+12: data 1
+data 2
+data 3
+data 4

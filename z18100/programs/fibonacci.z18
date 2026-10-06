@@ -1,0 +1,29 @@
+# Fibonacci numbers until they overflow a signed byte.
+#
+#   prev = 0, cur = 1
+#   loop:  next = prev + cur
+#          prev = cur, cur = next
+#          if next >= 0: goto loop
+#
+# prev lives in ALU latch A and cur in M15. The trick: after "DEMUX B"
+# puts cur into B, the MUX register still holds cur, so "DEMUX A" can copy
+# it into A for the next pass without touching memory.
+#
+# M15 goes 1 2 3 5 8 13 21 34 55 89 144. 144 is 1001 0000: as a signed
+# byte it is -112 (N = 1, O = 1), so the jump is not taken and the machine
+# halts on an undefined op code. Also shows "MUX 0": input D0 is not
+# connected, so it latches 0.
+
+0:  MUX 0                     # MUX reg = 0 (D0 is not connected)
+    DEMUX A                   # A = prev = 0
+2:  Load R3, M15              # R3 = cur              (the loop starts here)
+    MUX R3                    # MUX reg = cur (select 1 -> R3)
+    DEMUX B                   # B = cur
+    Add                       # Output = prev + cur = next
+    DEMUX A                   # A = cur (the MUX reg still holds it)
+    Move R0, Output           # R0 = next
+    Store M15, R0             # cur = next
+    Jump-if-not-negative M2   # if N = 0 (no overflow yet), go to address 2
+10: 1111 0000                 # op code 1111 is undefined: the machine halts
+
+15: data 1                    # cur

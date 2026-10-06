@@ -1,0 +1,27 @@
+# Add, Sub and the three flags (N, Z, O).
+#
+#   Output = 100 + 50     # 150 does not fit in a signed byte: it wraps
+#                         # to -106, so N = 1 and O (overflow) = 1
+#   Output = 50 - 50      # 0, so Z = 1 and N = 0
+#
+# Also shows that the MUX register HOLDS its value: after "MUX R2" the
+# program uses it twice (once into B, later into A) without re-selecting.
+# Uses R1 (MUX select 3) and ends by fetching an uninitialized word.
+
+0:  Load R1, M14              # R1 = 100
+1:  Load R2, M15              # R2 = 50
+    MUX R1                    # MUX reg = R1 (select 3 -> R1)
+    DEMUX A                   # A = 100
+    MUX R2                    # MUX reg = R2 (select 2 -> R2)
+    DEMUX B                   # B = 50
+    Add                       # Output = 150 = 1001 0110 -> -106: N=1, O=1
+    Move R0, Output           # R0 = -106
+    Store M14, R0             # M14 = 1001 0110 (100 was already used)
+    DEMUX A                   # A = MUX reg, which still holds 50
+    Sub                       # Output = 50 - 50 = 0: Z=1, N=0, O=0
+    Move R0, Output           # R0 = 0
+12: Store M15, R0             # M15 = 0
+13: xxxxxxxx                  # never set: fetching it halts the machine
+
+14: data 100                  # a
+15: data 50                   # b

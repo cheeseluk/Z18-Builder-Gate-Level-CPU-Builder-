@@ -1,0 +1,11 @@
+# Loads: memory -> data bus -> R1, R2, R3 (mission 11)
+Load R1, M12
+Load R2, M13
+Load R3, M14
+Load R2, M15
+xxxxxxxx          # halt here
+
+12: data 7
+data -5
+data 100
+data 42

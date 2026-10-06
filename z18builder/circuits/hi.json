@@ -1,0 +1,1966 @@
+{
+ "name": "hi",
+ "parts": [
+  {
+   "id": "p1",
+   "type": "RAM",
+   "x": 20,
+   "y": 60,
+   "params": {},
+   "label": "RAM 16 x 8",
+   "ref": "mem",
+   "mode": "detailed"
+  },
+  {
+   "id": "p2",
+   "type": "IR",
+   "x": 270,
+   "y": 80,
+   "params": {},
+   "label": "IR",
+   "ref": "ir",
+   "mode": "detailed"
+  },
+  {
+   "id": "p3",
+   "type": "REG",
+   "x": 500,
+   "y": 80,
+   "params": {
+    "width": 8,
+    "init": "0",
+    "ports": "top"
+   },
+   "label": "R1",
+   "ref": "r1",
+   "mode": "detailed"
+  },
+  {
+   "id": "p4",
+   "type": "REG",
+   "x": 610,
+   "y": 80,
+   "params": {
+    "width": 8,
+    "init": "0",
+    "ports": "top"
+   },
+   "label": "R2",
+   "ref": "r2",
+   "mode": "detailed"
+  },
+  {
+   "id": "p5",
+   "type": "REG",
+   "x": 720,
+   "y": 80,
+   "params": {
+    "width": 8,
+    "init": "0",
+    "ports": "top"
+   },
+   "label": "R3",
+   "ref": "r3",
+   "mode": "detailed"
+  },
+  {
+   "id": "p6",
+   "type": "CONST",
+   "x": 810,
+   "y": 150,
+   "params": {
+    "value": 0,
+    "width": 8
+   },
+   "label": "0 (D0)",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p7",
+   "type": "MUX4",
+   "x": 860,
+   "y": 150,
+   "params": {
+    "width": 8
+   },
+   "label": "MUX",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p8",
+   "type": "REG",
+   "x": 920,
+   "y": 170,
+   "params": {
+    "width": 8,
+    "init": "0",
+    "ports": "side"
+   },
+   "label": "MUX reg",
+   "ref": "muxReg",
+   "mode": "detailed"
+  },
+  {
+   "id": "p9",
+   "type": "DEMUX",
+   "x": 1030,
+   "y": 150,
+   "params": {
+    "width": 8
+   },
+   "label": "DEMUX",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p10",
+   "type": "REG",
+   "x": 1120,
+   "y": 100,
+   "params": {
+    "width": 8,
+    "init": "0",
+    "ports": "side"
+   },
+   "label": "A",
+   "ref": "a",
+   "mode": "detailed"
+  },
+  {
+   "id": "p11",
+   "type": "REG",
+   "x": 1120,
+   "y": 230,
+   "params": {
+    "width": 8,
+    "init": "0",
+    "ports": "side"
+   },
+   "label": "B",
+   "ref": "b",
+   "mode": "detailed"
+  },
+  {
+   "id": "p12",
+   "type": "ALU",
+   "x": 1240,
+   "y": 90,
+   "params": {},
+   "label": "ALU",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p13",
+   "type": "FLAGS",
+   "x": 1340,
+   "y": 90,
+   "params": {},
+   "label": "Flags",
+   "ref": "flags",
+   "mode": "detailed"
+  },
+  {
+   "id": "p14",
+   "type": "REG",
+   "x": 1340,
+   "y": 150,
+   "params": {
+    "width": 8,
+    "init": "0",
+    "ports": "side"
+   },
+   "label": "Output",
+   "ref": "out",
+   "mode": "detailed"
+  },
+  {
+   "id": "p15",
+   "type": "REG",
+   "x": 1340,
+   "y": 270,
+   "params": {
+    "width": 8,
+    "init": "0",
+    "ports": "top"
+   },
+   "label": "R0",
+   "ref": "r0",
+   "mode": "detailed"
+  },
+  {
+   "id": "p16",
+   "type": "TG",
+   "x": 1450,
+   "y": 310,
+   "params": {
+    "width": 8
+   },
+   "label": "R0 RE",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p17",
+   "type": "NOT",
+   "x": 1440,
+   "y": 90,
+   "params": {
+    "width": 1
+   },
+   "label": "NOT N",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p18",
+   "type": "AND",
+   "x": 1500,
+   "y": 90,
+   "params": {
+    "inputs": 2,
+    "width": 1
+   },
+   "label": "jump",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p19",
+   "type": "PC",
+   "x": 300,
+   "y": 290,
+   "params": {},
+   "label": "PC (+1)",
+   "ref": "pc",
+   "mode": "detailed"
+  },
+  {
+   "id": "p20",
+   "type": "TG",
+   "x": 420,
+   "y": 180,
+   "params": {
+    "width": 4
+   },
+   "label": "TG CLK",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p21",
+   "type": "TG",
+   "x": 420,
+   "y": 290,
+   "params": {
+    "width": 4
+   },
+   "label": "TG /CLK",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p22",
+   "type": "SPLIT",
+   "x": 820,
+   "y": 290,
+   "params": {
+    "width": 4,
+    "ranges": [
+     [
+      1,
+      0
+     ],
+     [
+      0,
+      0
+     ]
+    ]
+   },
+   "label": "addr",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p23",
+   "type": "OR",
+   "x": 140,
+   "y": 460,
+   "params": {
+    "inputs": 4,
+    "width": 1
+   },
+   "label": "RE",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p24",
+   "type": "DECODER",
+   "x": 20,
+   "y": 520,
+   "params": {
+    "bits": 4,
+    "outputs": 10
+   },
+   "label": "DEC 4>10",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p25",
+   "type": "CLOCK",
+   "x": -70,
+   "y": 560,
+   "params": {},
+   "label": "Clock",
+   "ref": null,
+   "mode": "detailed"
+  },
+  {
+   "id": "p26",
+   "type": "BUF",
+   "x": 20,
+   "y": 640,
+   "params": {
+    "width": 1
+   },
+   "label": "\"0\" fetch",
+   "ref": null,
+   "mode": "detailed"
+  }
+ ],
+ "wires": [
+  {
+   "id": "w32",
+   "a": [
+    "port",
+    "p1",
+    "din"
+   ],
+   "b": [
+    "junction",
+    "j27"
+   ],
+   "via": [
+    [
+     120,
+     30
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w33",
+   "a": [
+    "port",
+    "p1",
+    "dout"
+   ],
+   "b": [
+    "junction",
+    "j27"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w34",
+   "a": [
+    "junction",
+    "j27"
+   ],
+   "b": [
+    "junction",
+    "j28"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w35",
+   "a": [
+    "junction",
+    "j28"
+   ],
+   "b": [
+    "port",
+    "p2",
+    "d"
+   ],
+   "via": [
+    [
+     255,
+     100
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w36",
+   "a": [
+    "junction",
+    "j28"
+   ],
+   "b": [
+    "junction",
+    "j29"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w37",
+   "a": [
+    "junction",
+    "j29"
+   ],
+   "b": [
+    "port",
+    "p3",
+    "d"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w38",
+   "a": [
+    "junction",
+    "j29"
+   ],
+   "b": [
+    "junction",
+    "j30"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w39",
+   "a": [
+    "junction",
+    "j30"
+   ],
+   "b": [
+    "port",
+    "p4",
+    "d"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w40",
+   "a": [
+    "junction",
+    "j30"
+   ],
+   "b": [
+    "junction",
+    "j31"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w41",
+   "a": [
+    "junction",
+    "j31"
+   ],
+   "b": [
+    "port",
+    "p5",
+    "d"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w42",
+   "a": [
+    "junction",
+    "j31"
+   ],
+   "b": [
+    "port",
+    "p16",
+    "out"
+   ],
+   "via": [
+    [
+     1560,
+     30
+    ],
+    [
+     1560,
+     330
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w46",
+   "a": [
+    "port",
+    "p1",
+    "addr"
+   ],
+   "b": [
+    "junction",
+    "j43"
+   ],
+   "via": [
+    [
+     210,
+     450
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w47",
+   "a": [
+    "junction",
+    "j43"
+   ],
+   "b": [
+    "port",
+    "p19",
+    "d"
+   ],
+   "via": [
+    [
+     280,
+     310
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w48",
+   "a": [
+    "junction",
+    "j43"
+   ],
+   "b": [
+    "junction",
+    "j44"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w49",
+   "a": [
+    "port",
+    "p21",
+    "out"
+   ],
+   "b": [
+    "junction",
+    "j44"
+   ],
+   "via": [
+    [
+     480,
+     310
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w50",
+   "a": [
+    "junction",
+    "j44"
+   ],
+   "b": [
+    "junction",
+    "j45"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w51",
+   "a": [
+    "port",
+    "p20",
+    "out"
+   ],
+   "b": [
+    "junction",
+    "j45"
+   ],
+   "via": [
+    [
+     490,
+     200
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w52",
+   "a": [
+    "junction",
+    "j45"
+   ],
+   "b": [
+    "port",
+    "p22",
+    "in"
+   ],
+   "via": [
+    [
+     800,
+     450
+    ],
+    [
+     800,
+     300
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w53",
+   "a": [
+    "port",
+    "p22",
+    "out0"
+   ],
+   "b": [
+    "port",
+    "p7",
+    "sel"
+   ],
+   "via": [
+    [
+     870,
+     300
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w54",
+   "a": [
+    "port",
+    "p22",
+    "out1"
+   ],
+   "b": [
+    "port",
+    "p9",
+    "sel"
+   ],
+   "via": [
+    [
+     1040,
+     310
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w55",
+   "a": [
+    "port",
+    "p19",
+    "q"
+   ],
+   "b": [
+    "port",
+    "p21",
+    "in"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w56",
+   "a": [
+    "port",
+    "p2",
+    "operand"
+   ],
+   "b": [
+    "port",
+    "p20",
+    "in"
+   ],
+   "via": [
+    [
+     360,
+     200
+    ]
+   ],
+   "color": "operand",
+   "lamp": null
+  },
+  {
+   "id": "w57",
+   "a": [
+    "port",
+    "p2",
+    "opcode"
+   ],
+   "b": [
+    "port",
+    "p24",
+    "in"
+   ],
+   "via": [
+    [
+     330,
+     160
+    ],
+    [
+     265,
+     160
+    ],
+    [
+     265,
+     455
+    ],
+    [
+     40,
+     455
+    ]
+   ],
+   "color": "opcode",
+   "lamp": null
+  },
+  {
+   "id": "w58",
+   "a": [
+    "port",
+    "p5",
+    "q"
+   ],
+   "b": [
+    "port",
+    "p7",
+    "in1"
+   ],
+   "via": [
+    [
+     790,
+     180
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w59",
+   "a": [
+    "port",
+    "p4",
+    "q"
+   ],
+   "b": [
+    "port",
+    "p7",
+    "in2"
+   ],
+   "via": [
+    [
+     680,
+     200
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w60",
+   "a": [
+    "port",
+    "p3",
+    "q"
+   ],
+   "b": [
+    "port",
+    "p7",
+    "in3"
+   ],
+   "via": [
+    [
+     570,
+     220
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w61",
+   "a": [
+    "port",
+    "p6",
+    "out"
+   ],
+   "b": [
+    "port",
+    "p7",
+    "in0"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w62",
+   "a": [
+    "port",
+    "p7",
+    "out"
+   ],
+   "b": [
+    "port",
+    "p8",
+    "d"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w63",
+   "a": [
+    "port",
+    "p8",
+    "q"
+   ],
+   "b": [
+    "port",
+    "p9",
+    "in"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w64",
+   "a": [
+    "port",
+    "p9",
+    "f0"
+   ],
+   "b": [
+    "port",
+    "p10",
+    "d"
+   ],
+   "via": [
+    [
+     1100,
+     160
+    ],
+    [
+     1100,
+     120
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w65",
+   "a": [
+    "port",
+    "p9",
+    "en0"
+   ],
+   "b": [
+    "port",
+    "p10",
+    "we"
+   ],
+   "via": [
+    [
+     1130,
+     170
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w66",
+   "a": [
+    "port",
+    "p9",
+    "f1"
+   ],
+   "b": [
+    "port",
+    "p11",
+    "d"
+   ],
+   "via": [
+    [
+     1100,
+     210
+    ],
+    [
+     1100,
+     250
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w67",
+   "a": [
+    "port",
+    "p9",
+    "en1"
+   ],
+   "b": [
+    "port",
+    "p11",
+    "we"
+   ],
+   "via": [
+    [
+     1080,
+     220
+    ],
+    [
+     1080,
+     290
+    ],
+    [
+     1130,
+     290
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w68",
+   "a": [
+    "port",
+    "p10",
+    "q"
+   ],
+   "b": [
+    "port",
+    "p12",
+    "a"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w69",
+   "a": [
+    "port",
+    "p11",
+    "q"
+   ],
+   "b": [
+    "port",
+    "p12",
+    "b"
+   ],
+   "via": [
+    [
+     1220,
+     250
+    ],
+    [
+     1220,
+     220
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w70",
+   "a": [
+    "port",
+    "p12",
+    "n"
+   ],
+   "b": [
+    "port",
+    "p13",
+    "n"
+   ],
+   "via": [
+    [
+     1320,
+     120
+    ],
+    [
+     1320,
+     100
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w71",
+   "a": [
+    "port",
+    "p12",
+    "z"
+   ],
+   "b": [
+    "port",
+    "p13",
+    "z"
+   ],
+   "via": [
+    [
+     1325,
+     130
+    ],
+    [
+     1325,
+     110
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w72",
+   "a": [
+    "port",
+    "p12",
+    "o"
+   ],
+   "b": [
+    "port",
+    "p13",
+    "o"
+   ],
+   "via": [
+    [
+     1330,
+     140
+    ],
+    [
+     1330,
+     120
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w73",
+   "a": [
+    "port",
+    "p12",
+    "out"
+   ],
+   "b": [
+    "port",
+    "p14",
+    "d"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w75",
+   "a": [
+    "port",
+    "p12",
+    "go"
+   ],
+   "b": [
+    "junction",
+    "j74"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w76",
+   "a": [
+    "junction",
+    "j74"
+   ],
+   "b": [
+    "port",
+    "p14",
+    "we"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w77",
+   "a": [
+    "junction",
+    "j74"
+   ],
+   "b": [
+    "port",
+    "p13",
+    "we"
+   ],
+   "via": [
+    [
+     1430,
+     210
+    ],
+    [
+     1430,
+     140
+    ],
+    [
+     1380,
+     140
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w78",
+   "a": [
+    "port",
+    "p14",
+    "q"
+   ],
+   "b": [
+    "port",
+    "p15",
+    "d"
+   ],
+   "via": [
+    [
+     1440,
+     170
+    ],
+    [
+     1440,
+     250
+    ],
+    [
+     1380,
+     250
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w79",
+   "a": [
+    "port",
+    "p15",
+    "q"
+   ],
+   "b": [
+    "port",
+    "p16",
+    "in"
+   ],
+   "via": [
+    [
+     1410,
+     330
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w82",
+   "a": [
+    "port",
+    "p25",
+    "clk"
+   ],
+   "b": [
+    "junction",
+    "j80"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": "CLK"
+  },
+  {
+   "id": "w83",
+   "a": [
+    "junction",
+    "j80"
+   ],
+   "b": [
+    "port",
+    "p24",
+    "en"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w84",
+   "a": [
+    "junction",
+    "j80"
+   ],
+   "b": [
+    "junction",
+    "j81"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w85",
+   "a": [
+    "junction",
+    "j81"
+   ],
+   "b": [
+    "port",
+    "p19",
+    "inc"
+   ],
+   "via": [
+    [
+     330,
+     670
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w86",
+   "a": [
+    "junction",
+    "j81"
+   ],
+   "b": [
+    "port",
+    "p20",
+    "en"
+   ],
+   "via": [
+    [
+     405,
+     670
+    ],
+    [
+     405,
+     170
+    ],
+    [
+     440,
+     170
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w88",
+   "a": [
+    "port",
+    "p25",
+    "clkBar"
+   ],
+   "b": [
+    "junction",
+    "j87"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": "/CLK"
+  },
+  {
+   "id": "w89",
+   "a": [
+    "junction",
+    "j87"
+   ],
+   "b": [
+    "port",
+    "p26",
+    "in"
+   ],
+   "via": [
+    [
+     -10,
+     650
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w90",
+   "a": [
+    "junction",
+    "j87"
+   ],
+   "b": [
+    "port",
+    "p21",
+    "en"
+   ],
+   "via": [
+    [
+     -10,
+     680
+    ],
+    [
+     412,
+     680
+    ],
+    [
+     412,
+     280
+    ],
+    [
+     440,
+     280
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w92",
+   "a": [
+    "port",
+    "p26",
+    "out"
+   ],
+   "b": [
+    "junction",
+    "j91"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": "fetch"
+  },
+  {
+   "id": "w93",
+   "a": [
+    "junction",
+    "j91"
+   ],
+   "b": [
+    "port",
+    "p23",
+    "in0"
+   ],
+   "via": [
+    [
+     80,
+     470
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w94",
+   "a": [
+    "junction",
+    "j91"
+   ],
+   "b": [
+    "port",
+    "p2",
+    "we"
+   ],
+   "via": [
+    [
+     398,
+     650
+    ],
+    [
+     398,
+     140
+    ],
+    [
+     290,
+     140
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w95",
+   "a": [
+    "port",
+    "p23",
+    "out"
+   ],
+   "b": [
+    "port",
+    "p1",
+    "re"
+   ],
+   "via": [
+    [
+     200,
+     490
+    ],
+    [
+     200,
+     400
+    ],
+    [
+     60,
+     400
+    ]
+   ],
+   "color": null,
+   "lamp": "RE"
+  },
+  {
+   "id": "w96",
+   "a": [
+    "port",
+    "p24",
+    "d0"
+   ],
+   "b": [
+    "port",
+    "p15",
+    "we"
+   ],
+   "via": [
+    [
+     1350,
+     530
+    ]
+   ],
+   "color": null,
+   "lamp": "R0 WE"
+  },
+  {
+   "id": "w98",
+   "a": [
+    "port",
+    "p24",
+    "d1"
+   ],
+   "b": [
+    "junction",
+    "j97"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": "R1 WE"
+  },
+  {
+   "id": "w99",
+   "a": [
+    "junction",
+    "j97"
+   ],
+   "b": [
+    "port",
+    "p23",
+    "in1"
+   ],
+   "via": [
+    [
+     110,
+     480
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w100",
+   "a": [
+    "junction",
+    "j97"
+   ],
+   "b": [
+    "port",
+    "p3",
+    "we"
+   ],
+   "via": [
+    [
+     510,
+     540
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w102",
+   "a": [
+    "port",
+    "p24",
+    "d2"
+   ],
+   "b": [
+    "junction",
+    "j101"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": "R2 WE"
+  },
+  {
+   "id": "w103",
+   "a": [
+    "junction",
+    "j101"
+   ],
+   "b": [
+    "port",
+    "p23",
+    "in2"
+   ],
+   "via": [
+    [
+     120,
+     500
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w104",
+   "a": [
+    "junction",
+    "j101"
+   ],
+   "b": [
+    "port",
+    "p4",
+    "we"
+   ],
+   "via": [
+    [
+     620,
+     550
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w106",
+   "a": [
+    "port",
+    "p24",
+    "d3"
+   ],
+   "b": [
+    "junction",
+    "j105"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": "R3 WE"
+  },
+  {
+   "id": "w107",
+   "a": [
+    "junction",
+    "j105"
+   ],
+   "b": [
+    "port",
+    "p23",
+    "in3"
+   ],
+   "via": [
+    [
+     130,
+     510
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w108",
+   "a": [
+    "junction",
+    "j105"
+   ],
+   "b": [
+    "port",
+    "p5",
+    "we"
+   ],
+   "via": [
+    [
+     730,
+     560
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w109",
+   "a": [
+    "port",
+    "p24",
+    "d4"
+   ],
+   "b": [
+    "port",
+    "p8",
+    "we"
+   ],
+   "via": [
+    [
+     930,
+     570
+    ]
+   ],
+   "color": null,
+   "lamp": "MUX E"
+  },
+  {
+   "id": "w110",
+   "a": [
+    "port",
+    "p24",
+    "d5"
+   ],
+   "b": [
+    "port",
+    "p9",
+    "e"
+   ],
+   "via": [
+    [
+     1060,
+     580
+    ]
+   ],
+   "color": null,
+   "lamp": "DMX E"
+  },
+  {
+   "id": "w111",
+   "a": [
+    "port",
+    "p24",
+    "d6"
+   ],
+   "b": [
+    "port",
+    "p12",
+    "plus"
+   ],
+   "via": [
+    [
+     1260,
+     590
+    ]
+   ],
+   "color": null,
+   "lamp": "ALU +"
+  },
+  {
+   "id": "w112",
+   "a": [
+    "port",
+    "p24",
+    "d7"
+   ],
+   "b": [
+    "port",
+    "p12",
+    "minus"
+   ],
+   "via": [
+    [
+     1280,
+     600
+    ]
+   ],
+   "color": null,
+   "lamp": "ALU -"
+  },
+  {
+   "id": "w113",
+   "a": [
+    "port",
+    "p24",
+    "d8"
+   ],
+   "b": [
+    "port",
+    "p18",
+    "in1"
+   ],
+   "via": [
+    [
+     1495,
+     610
+    ],
+    [
+     1495,
+     120
+    ]
+   ],
+   "color": null,
+   "lamp": "d8"
+  },
+  {
+   "id": "w115",
+   "a": [
+    "port",
+    "p24",
+    "d9"
+   ],
+   "b": [
+    "junction",
+    "j114"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": "WE, R0 RE"
+  },
+  {
+   "id": "w116",
+   "a": [
+    "junction",
+    "j114"
+   ],
+   "b": [
+    "port",
+    "p1",
+    "we"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w117",
+   "a": [
+    "junction",
+    "j114"
+   ],
+   "b": [
+    "port",
+    "p16",
+    "en"
+   ],
+   "via": [
+    [
+     1590,
+     620
+    ],
+    [
+     1590,
+     300
+    ],
+    [
+     1470,
+     300
+    ]
+   ],
+   "color": null,
+   "lamp": null
+  },
+  {
+   "id": "w118",
+   "a": [
+    "port",
+    "p13",
+    "nq"
+   ],
+   "b": [
+    "port",
+    "p17",
+    "in"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": "N"
+  },
+  {
+   "id": "w119",
+   "a": [
+    "port",
+    "p17",
+    "out"
+   ],
+   "b": [
+    "port",
+    "p18",
+    "in0"
+   ],
+   "via": [],
+   "color": null,
+   "lamp": "NOT N"
+  },
+  {
+   "id": "w120",
+   "a": [
+    "port",
+    "p18",
+    "out"
+   ],
+   "b": [
+    "port",
+    "p19",
+    "we"
+   ],
+   "via": [
+    [
+     1575,
+     110
+    ],
+    [
+     1575,
+     440
+    ],
+    [
+     310,
+     440
+    ]
+   ],
+   "color": null,
+   "lamp": "PC WE"
+  }
+ ],
+ "junctions": [
+  {
+   "id": "j27",
+   "x": 160,
+   "y": 30
+  },
+  {
+   "id": "j28",
+   "x": 255,
+   "y": 30
+  },
+  {
+   "id": "j29",
+   "x": 540,
+   "y": 30
+  },
+  {
+   "id": "j30",
+   "x": 650,
+   "y": 30
+  },
+  {
+   "id": "j31",
+   "x": 760,
+   "y": 30
+  },
+  {
+   "id": "j43",
+   "x": 280,
+   "y": 450
+  },
+  {
+   "id": "j44",
+   "x": 480,
+   "y": 450
+  },
+  {
+   "id": "j45",
+   "x": 490,
+   "y": 450
+  },
+  {
+   "id": "j74",
+   "x": 1350,
+   "y": 210
+  },
+  {
+   "id": "j80",
+   "x": 0,
+   "y": 570
+  },
+  {
+   "id": "j81",
+   "x": 0,
+   "y": 670
+  },
+  {
+   "id": "j87",
+   "x": -10,
+   "y": 590
+  },
+  {
+   "id": "j91",
+   "x": 80,
+   "y": 650
+  },
+  {
+   "id": "j97",
+   "x": 110,
+   "y": 540
+  },
+  {
+   "id": "j101",
+   "x": 120,
+   "y": 550
+  },
+  {
+   "id": "j105",
+   "x": 130,
+   "y": 560
+  },
+  {
+   "id": "j114",
+   "x": 100,
+   "y": 620
+  }
+ ],
+ "nextId": 121,
+ "version": 1
+}

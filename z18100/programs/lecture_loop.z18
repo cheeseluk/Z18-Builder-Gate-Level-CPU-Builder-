@@ -1,0 +1,25 @@
+# The example program from 18-100 lectures 06-07 (spec section 5):
+#
+#   a = 7, b = 5
+#   loop:  a = a - b
+#          if a >= 0: goto loop
+#   store a
+#
+# One memory word per line: [7:4] op code | [3:0] address/operand.
+# "13:" puts a word at address 13. Words never set stay xxxxxxxx.
+
+0:  Load R2, M13              # R2 = b
+1:  Load R3, M14              # R3 = a            (the loop starts here)
+    MUX 2                     # MUX latches R2    (select 2 -> R2)
+    DEMUX 1                   # B = MUX reg = b
+    MUX 1                     # MUX latches R3    (select 1 -> R3)
+    DEMUX 0                   # A = MUX reg = a
+    Sub 15                    # Output = A - B.   The lecture fills the unused
+    Move R0, Output 15        # R0 = Output       operand with 1111
+    Store M14, R0             # a = R0
+    Jump-if-not-negative M1   # if N = 0 (a >= 0), go to address 1
+10: Store M15, R0             # the final result
+
+13: data 5                    # b
+14: data 7                    # a
+15: data 0                    # result slot
