@@ -2159,6 +2159,42 @@ def testUserPartLayout():
         shutil.rmtree(folder, ignore_errors=True)
     print('Passed!')
 
+def testRenamePort():
+    print('Testing renaming a port of your part...', end='')
+    import zb_missions
+    folder = os.path.join(HERE, 'rename_test_tmp')
+    app = makeFakeApp(folder)
+    try:
+        zb_editor.PARTS_DIR = os.path.join(folder, 'parts')
+        name = zb_missions.rewardPart(app.library,
+                                      zb_missions.getMission('fulladd'),
+                                      RECIPES['FULLADD']({}),
+                                      zb_editor.PARTS_DIR)
+        adder = placeFake(app, name, 200, 200)
+        pin = placeFake(app, 'PIN_IN', 0, 200)
+        wireFake(app, pin, 'out', adder, 'a')
+        definition = app.library['user'][name]
+        zb_editor.renamePort(app, definition, 'a', ' x ')
+        names = [p['name'] for p in partLayout(app.library, adder)[2]]
+        assert('x' in names and 'a' not in names), names
+        ends = [w['b'] if w['b'][1] == adder['id'] else w['a']
+                for w in app.root['wires']]
+        assert(ends == [['port', adder['id'], 'x']]), ends
+        assert(not definition['verified'])
+        # Bad names change nothing
+        for bad in ['', 'b', 'two words', 'waytoolongname']:
+            zb_editor.renamePort(app, definition, 'x', bad)
+            assert(zb_editor.portPin(definition, 'x') != None), bad
+        # Undo puts the old name and its wire back
+        zb_editor.undo(app)
+        definition = app.library['user'][name]
+        assert(zb_editor.portPin(definition, 'a') != None)
+        assert(any(end == ['port', adder['id'], 'a'] for w in
+                   app.root['wires'] for end in [w['a'], w['b']]))
+    finally:
+        shutil.rmtree(folder, ignore_errors=True)
+    print('Passed!')
+
 def testParamSteppers():
     print('Testing the - / + buttons and choices...', end='')
     folder = os.path.join(HERE, 'stepper_test_tmp')
@@ -2384,6 +2420,7 @@ def testAll():
     # Round 3
     testBusWiring()
     testUserPartLayout()
+    testRenamePort()
     testParamSteppers()
     testStashAndSave()
     testVerifyChoices()

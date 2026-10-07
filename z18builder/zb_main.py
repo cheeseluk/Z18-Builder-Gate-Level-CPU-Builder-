@@ -62,7 +62,7 @@ from zb_editor import (CIRCUIT_DIR, PARTS_DIR, AUTOSAVE, USER_SHAPES,
                        showExplanation, tidy, atRunTop, runBase, soloMessage,
                        partBoxSize, parseSize,
                        setPartSize, growPart, cyclePortSide,
-                       movePortEarlier, stepParam, cycleParam,
+                       movePortEarlier, renamePort, stepParam, cycleParam,
                        busConnect, pickBusBit, openPartSheet,
                        restoreStash, stashRoot)
 from zb_explain import explainValue, partsOnLevel
@@ -1750,7 +1750,8 @@ def doSideAction(app, action):
         return checkMission(app)
     if kind == 'verify':
         return askVerify(app)
-    if kind in ['size', 'autoSize', 'grow', 'portSide', 'portUp']:
+    if kind in ['size', 'autoSize', 'grow', 'portSide', 'portUp',
+                'portName']:
         definition = app.library['user'].get(action[1])
         if definition == None:
             return
@@ -1764,6 +1765,10 @@ def doSideAction(app, action):
             return growPart(app, definition, action[2], action[3])
         if kind == 'portSide':
             return cyclePortSide(app, definition, action[2])
+        if kind == 'portName':
+            text = app.getTextInput(f'New name for port {action[2]} '
+                                    '(letters, digits, _):')
+            return renamePort(app, definition, action[2], text)
         return movePortEarlier(app, definition, action[2])
     if kind in ['wireColor', 'wireLamp']:
         from zb_circuit import findWire

@@ -388,6 +388,7 @@ def redo(app):
 def afterEdit(app, saveUndo=True):
     # Call after every change to a circuit
     app.editVersion += 1
+    app.hoverNet = None                # net numbers change with the circuit
     name = editingPartName(app)
     if name != None and name in app.library['user']:
         definition = app.library['user'][name]
@@ -1136,6 +1137,10 @@ def setParam(app, part, key, text):
     pushUndo(app)
     part['params'] = params
     app.lastParams[part['type']] = copy.deepcopy(params)
+    if (key == 'name' and part['type'] in ['PIN_IN', 'PIN_OUT'] and
+            editingPartName(app) != None and value != old):
+        # the pin is a port of this part: its copies keep their wires
+        renamePortWires(app, editingPartName(app), old, value)
     dropBadWires(app, part)
     afterEdit(app)
     return None
@@ -1431,6 +1436,63 @@ def movePortEarlier(app, definition, portName):
         other['params']['order'] = order
     definitionChanged(app.library)
     afterLayoutEdit(app, definition, f'{portName} moved up')
+
+MAX_PORT_NAME = 10
+
+def portNameProblem(circuit, pin, name):
+    # Why name can't be this pin's (port's) name, or None if it can
+    if name == '':
+        return 'A port needs a name'
+    if len(name) > MAX_PORT_NAME:
+        return f'Port names are at most {MAX_PORT_NAME} characters'
+    if not all(c.isalnum() or c == '_' for c in name):
+        return 'Port names use letters, digits and _ only'
+    for other in circuit['parts']:
+        if (other is not pin and other['type'] in ['PIN_IN', 'PIN_OUT']
+                and other['params']['name'] == name):
+            return f'Another port is already called {name}'
+    return None
+
+def renamePortWires(app, partName, oldName, newName):
+    # Wires on the copies of user part partName that end at its port
+    # oldName now end at newName (in your circuit and in your other parts)
+    circuits = [(app.root, None)]
+    if app.stash != None:
+        circuits.append((app.stash['root'], None))
+    for definition in app.library['user'].values():
+        circuits.append((definition['circuit'], definition))
+    for circuit, owner in circuits:
+        ids = {part['id'] for part in circuit['parts']
+               if part['type'] == partName}
+        if len(ids) == 0:
+            continue
+        for wire in circuit['wires']:
+            for end in [wire['a'], wire['b']]:
+                if (end[0] == 'port' and end[1] in ids and
+                        end[2] == oldName):
+                    end[2] = newName
+        if owner != None:
+            saveUserPart(owner, PARTS_DIR)
+
+def renamePort(app, definition, oldName, text):
+    # Gives one of your part's ports a new name: the IN / OUT pin inside
+    # it is renamed, and the wires on its copies stay connected
+    pin = portPin(definition, oldName)
+    if pin == None or text == None:
+        return
+    newName = text.strip()
+    if newName == oldName:
+        return
+    problem = portNameProblem(definition['circuit'], pin, newName)
+    if problem != None:
+        return say(app, problem, 'error')
+    pushUndo(app)
+    pin['params']['name'] = newName
+    renamePortWires(app, definition['name'], oldName, newName)
+    definition['verified'] = False     # (its ports changed)
+    definitionChanged(app.library)
+    afterLayoutEdit(app, definition, f'Port {oldName} is now called '
+                                     f'{newName}')
 
 def userPortRows(app, definition):
     # [(port name, side, direction, width)] in the order they are drawn

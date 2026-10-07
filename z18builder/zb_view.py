@@ -529,6 +529,9 @@ def getFocus(app):
     from zb_editor import partNeighbors
     focus = {'nets': set(), 'feeders': set(), 'takers': set(),
              'part': None}
+    netCount = len(getLevelInfo(app)['nets']['nets'])
+    if app.hoverNet != None and app.hoverNet >= netCount:
+        app.hoverNet = None            # left over from before an edit
     if app.hoverNet != None and app.netHighlight:
         focus['nets'] = {app.hoverNet}
     elif focusPart(app) != None:
@@ -1699,13 +1702,14 @@ def addLayoutRows(app, add, definition):
         buttons=[('-', ('grow', name, -10, 0)), ('+', ('grow', name, 10, 0))])
     add(f'  height {height}', None, TEXT_COLOR,
         buttons=[('-', ('grow', name, 0, -10)), ('+', ('grow', name, 0, 10))])
-    add('ports (click one: move it to the next side)', None, DIM_TEXT_COLOR)
+    add('ports (click: next side, name: rename)', None, DIM_TEXT_COLOR)
     for portName, side, direction, bits in userPortRows(app,
                                                         definition)[:12]:
         kind = 'IN ' if direction == 'in' else 'OUT'
         add(f'  {kind} {portName:7} {bits}b  {side}',
             ('portSide', name, portName),
-            buttons=[('up', ('portUp', name, portName))])
+            buttons=[('name', ('portName', name, portName)),
+                     ('up', ('portUp', name, portName))])
 
 def addPartRows(app, add, part):
     definition = getDefinition(app.library, part['type'])
