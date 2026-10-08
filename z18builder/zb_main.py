@@ -28,9 +28,9 @@ from zb_paint import beginFrame, endFrame, fitWindow, toDesign, startSize
 from cmu_graphics import pygameEvent
 import importlib
 import z18_cpu
-from z18_assembler import assembleProgram, disassemble
+from z18_assembler import assembleProgram
 from z18_isa import opcodeBits
-from zb_values import Z, X, isKnown, mask, formatValue
+from zb_values import Z, isKnown, mask, formatValue
 from zb_parts import (PRIMITIVES, RAM_WORDS, rangePresets, widthPresets,
                       formatRanges, formatWidths)
 from zb_circuit import (makeLibrary, makeCircuit, findPart, getDefinition,
@@ -43,39 +43,33 @@ from zb_kit import (attachRecipes, attachKit, kitWarnings,
                     makeReferenceMachine, makeChecker, checkerGoTo,
                     checkerStep, compareWithGolden, TAG_NAMES, goldenWhy,
                     instructionText)
-from zb_editor import (CIRCUIT_DIR, PARTS_DIR, AUTOSAVE, USER_SHAPES,
-                       initAppFields, syncProblems, getCanvas, getCam,
-                       toWorld, inCanvas, fitView, zoomStep, panBy,
-                       getCircuit, isEditable, editingPartName,
+from zb_editor import (CIRCUIT_DIR, PARTS_DIR, AUTOSAVE, initAppFields,
+                       syncProblems, getCanvas, getCam, toWorld, inCanvas,
+                       fitView, zoomStep, panBy, getCircuit, isEditable,
                        readOnlyMessage, hitTest, undo, redo, say,
                        emptySelection, refreshView, drillIn, drillOut,
-                       cancelTool, startPlacing, placeAt, startWire,
-                       addBend, finishWire, startMove, dragMove, endDrag,
-                       selectBox, deleteSelection, copySelection, paste,
-                       duplicate, getSelectedPart, getSelectedWire,
-                       setParam, setLabel, cycleTag, cycleWireColor,
-                       setLamp, toggleMode, packInto, copyRecipe,
-                       verifyCurrent, newUserPart,
-                       currentUserPart, listCircuits, saveAs, openCircuit,
-                       listCircuitsByDate, isUnsaved, openFile, changeAnimLevel, advanceWave,
-                       editSimState, tableForView, openTableData,
-                       tableRows, setRootPins, rootPins, explainRow,
-                       showExplanation, tidy, atRunTop, runBase, soloMessage,
-                       partBoxSize, parseSize,
-                       setPartSize, growPart, cyclePortSide,
-                       movePortEarlier, renamePort, stepParam, cycleParam,
-                       busConnect, pickBusBit, openPartSheet,
-                       restoreStash, stashRoot)
-from zb_explain import explainValue, partsOnLevel
+                       cancelTool, startPlacing, placeAt, startWire, addBend,
+                       finishWire, startMove, dragMove, endDrag, selectBox,
+                       deleteSelection, copySelection, paste, duplicate,
+                       getSelectedPart, setParam, setLabel, cycleTag,
+                       cycleWireColor, setLamp, toggleMode, packInto,
+                       copyRecipe, verifyCurrent, newUserPart, currentUserPart,
+                       saveAs, openCircuit, listCircuitsByDate, openFile,
+                       changeAnimLevel, advanceWave, editSimState,
+                       tableForView, openTableData, tableRows, setRootPins,
+                       rootPins, explainRow, showExplanation, tidy, atRunTop,
+                       runBase, soloMessage, partBoxSize, parseSize,
+                       setPartSize, growPart, cyclePortSide, movePortEarlier,
+                       renamePort, stepParam, cycleParam, busConnect,
+                       pickBusBit, openPartSheet, restoreStash, stashRoot)
+from zb_explain import partsOnLevel
 from zb_view import (drawApp, drawVerify, LAYOUT, TOOLBAR_TOP, PALETTE_RECT,
                      SIDE, BOTTOM, TIMELINE, TRACK_LEFT, TRACK_RIGHT, IDLE,
-                     WAVES, EDGE, FRAMES_PER_WAVE, WINDOW_WIDTH,
-                     WINDOW_HEIGHT, paletteItems, paletteRowRect,
-                     paletteTabRect, sideRowRect, sideButtonRects,
-                     getPropertyRows,
-                     pickerRowRect, ramRowAt, ramBitAt, getPrim, portNet, portValue,
-                     netValue, netWave, isLive, getLevelInfo, paramText,
-                     partTitle, crumbRects, crumbLevel)
+                     WAVES, EDGE, FRAMES_PER_WAVE, paletteItems,
+                     paletteRowRect, paletteTabRect, sideRowRect,
+                     sideButtonRects, getPropertyRows, pickerRowRect, ramRowAt,
+                     ramBitAt, getPrim, portNet, portValue, netValue, netWave,
+                     isLive, getLevelInfo, paramText, crumbRects, crumbLevel)
 import zb_missions
 
 FRAME_RATE = 60

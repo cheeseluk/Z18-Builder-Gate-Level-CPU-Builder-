@@ -13,8 +13,8 @@ import os
 import copy
 import json
 import random
-from zb_values import Z, X, isKnown, mask, formatValue
-from zb_parts import PRIMITIVES, STATEFUL_TYPES, GRID
+from zb_values import Z, X, mask, formatValue
+from zb_parts import PRIMITIVES, STATEFUL_TYPES
 from zb_circuit import (getDefinition, definitionChanged, partLayout,
                         makeCircuit, addPart, addWire, findPart,
                         computeNets, getDrivers, nodeKey, circuitToText,

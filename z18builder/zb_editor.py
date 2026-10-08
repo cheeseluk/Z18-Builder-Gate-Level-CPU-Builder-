@@ -6,20 +6,17 @@
 import os
 import copy
 import json
-from zb_parts import (PRIMITIVES, GRID, checkParams, parseRanges,
-                      parseWidths, formatRanges, formatWidths)
-from zb_circuit import (getDefinition, partLayout, partBounds,
-                        portPosition, addPart, addWire, findPart,
-                        findWire, findJunction, removePart, removeWire,
+from zb_parts import (PRIMITIVES, GRID, checkParams, parseRanges, parseWidths)
+from zb_circuit import (getDefinition, partLayout, partBounds, addPart,
+                        addWire, findPart, findWire, findJunction, removePart,
                         removeJunction, splitWire, wirePoints, movePart,
                         checkNewWire, copyParts, pasteParts, circuitToText,
-                        circuitFromText, saveCircuit, loadCircuit,
-                        makeCircuit, getPort, isPrimitive, validate,
-                        cleanUpJunctions, wireGeometry, layoutProblems,
-                        definitionChanged)
+                        circuitFromText, saveCircuit, loadCircuit, makeCircuit,
+                        getPort, validate, cleanUpJunctions, wireGeometry,
+                        layoutProblems, definitionChanged)
 from zb_library import (updateUserPart, saveUserPart, packSelection,
-                        getInnerCircuit, verifyPart, partToText)
-from zb_kit import TAGS, tagFits, TAG_NAMES
+                        getInnerCircuit, verifyPart)
+from zb_kit import TAGS, tagFits
 from zb_helpers import distanceToPath
 
 HERE = os.path.dirname(os.path.abspath(__file__))

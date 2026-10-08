@@ -13,7 +13,7 @@
 import os
 import copy
 import json
-from zb_values import mask, formatValue
+from zb_values import formatValue
 from zb_parts import PRIMITIVES
 from zb_circuit import (makeCircuit, addPart, removePart, validate,
                         definitionChanged, compositeInfo, portsMatch)

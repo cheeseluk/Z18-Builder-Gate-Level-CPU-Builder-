@@ -22,9 +22,8 @@ from zb_values import (Z, X, isKnown, formatValue, formatAll, getBit,
 from zb_parts import PRIMITIVES, RAM_WORDS, formatRanges, formatWidths
 from zb_circuit import (getDefinition, partLayout, wirePoints, findPart,
                         computeNets, nodeKey, portSide, getPort)
-from zb_editor import (toWorld, getCam, getCircuit,
-                       hitTest, getSelectedPart, getSelectedWire,
-                       isEditable, editingPartName, snap)
+from zb_editor import (toWorld, getCam, getCircuit, getSelectedPart,
+                       getSelectedWire, editingPartName, snap)
 from zb_editor import toScreen as editorToScreen
 from zb_editor import getCanvas as editorGetCanvas
 from zb_kit import PALETTE as KIT_PALETTE, TAG_NAMES
@@ -96,8 +95,7 @@ SIDE_ROW_HEIGHT = 20
 LAYOUT = {'buildCanvas': BUILD_CANVAS, 'runCanvas': RUN_CANVAS}
 
 IDLE, WAVES, EDGE = 0, 1, 2
-from zb_editor import (SPEEDS, FRAMES_PER_WAVE, START_ANIM_LEVEL,
-                       speedLabel)
+from zb_editor import SPEEDS, FRAMES_PER_WAVE, speedLabel
 MIN_PACKET_PATH = 40
 MIN_TEXT = 5.5                 # smallest canvas text, in design units
 RAM_ROW_TOP = 26

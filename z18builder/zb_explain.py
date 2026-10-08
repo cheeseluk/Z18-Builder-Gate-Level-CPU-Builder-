@@ -10,7 +10,6 @@
 #    'nets', 'prims'}
 
 from zb_values import Z, X, isKnown, formatValue
-from zb_parts import PRIMITIVES
 from z18_assembler import shortDisassemble
 from z18_isa import LECTURE_ISA, OPCODE_SLOTS
 

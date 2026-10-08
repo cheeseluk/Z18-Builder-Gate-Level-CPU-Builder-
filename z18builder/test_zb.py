@@ -17,18 +17,16 @@ from zb_values import Z, X, formatValue, formatAll
 from zb_parts import PRIMITIVES, gateRows, checkParams
 from zb_circuit import (makeLibrary, makeCircuit, addPart, addWire,
                         addJunction, computeNets, checkNewWire, validate,
-                        circuitToText, circuitFromText, splitWire,
-                        removePart, nodeKey, findPart, wirePoints,
-                        copyParts, pasteParts, movePart, partLayout)
-from zb_sim import (flatten, stepPhase, stepInstruction, runToEnd,
-                    goToStep, loadProgram, settle, taggedValues,
-                    beginPhase, endPhase, snapshot)
-from zb_library import (makeUserPart, verifyPart, packSelection,
-                        makeTester, runTester, innerView, topView,
-                        partToText, loadUserParts, saveUserPart)
+                        circuitToText, circuitFromText, splitWire, removePart,
+                        findPart, wirePoints, copyParts, pasteParts, movePart,
+                        partLayout)
+from zb_sim import (flatten, stepPhase, runToEnd, goToStep, loadProgram,
+                    settle, taggedValues, beginPhase, endPhase, snapshot)
+from zb_library import (makeUserPart, verifyPart, packSelection, makeTester,
+                        runTester, innerView, topView, loadUserParts,
+                        saveUserPart)
 from zb_kit import (makeReferenceMachine, attachKit, attachRecipes,
-                    runAndCompare, RECIPES, expandToGates, makeChecker,
-                    checkerStep, kitWarnings, PALETTE)
+                    runAndCompare, RECIPES, expandToGates, kitWarnings, PALETTE)
 
 PROGRAM_DIR = os.path.join(PROJECT_DIR, 'z18100', 'programs')
 
@@ -464,7 +462,7 @@ def testUnconditionalJump():
 
 def testDeclaredCaptions():
     print('Testing captions with declared instructions...', end='')
-    from zb_explain import phaseText, portText
+    from zb_explain import phaseText
     library, circuit = makeJumpMachine()
     result = assembleProgram(JUMP_PROGRAM)
     sim = flatten(library, circuit)
@@ -1935,7 +1933,7 @@ def testTidyKeepsCircuit():
     print('Testing that Tidy wires changes only the geometry...', end='')
     from zb_route import tidyWires
     from zb_circuit import wireGeometry
-    from zb_library import truthTable, builtInExpected
+    from zb_library import truthTable
     library = newLibrary()
     circuit = buildFullAdder('messy')
     nets = computeNets(library, circuit)['nodeNet']

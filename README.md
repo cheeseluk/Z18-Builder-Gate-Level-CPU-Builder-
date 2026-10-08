@@ -40,7 +40,7 @@ Every input row in textbook order, with an *expected* column that marks wrong ce
 
 Three groups: basic parts (full adder up to the ALU, decoder and MUX), then memory (SR latch, D latch, D flip-flop, register), then the full machine (fetch, loads, MUX/DEMUX, store, jump).
 
-![The mission picker: parts, memory and machine missions](ZBuilder18%20Media/placeholder.png)
+![The mission picker: parts, memory and machine missions](ZBuilder18%20Media/mission-picker.png)
 
 ---
 
@@ -104,7 +104,7 @@ To run a sample program:
 2. Press `l` to pick a program. Samples are in `z18100/programs/` (`fibonacci.z18`, `max.z18`, `flags.z18`, `self_modify.z18`, …) and `z18builder/programs/`.
 3. Press `r` to run or pause, `space` to step one instruction, `p` for one phase and `n` for one wave. Use `+` / `-` for speed, and `?` for all the keys.
 
-To run the tests (no window needed; all 68 pass):
+To run the tests (no window needed; all 69 pass):
 
 ```
 python z18builder/test_zb.py

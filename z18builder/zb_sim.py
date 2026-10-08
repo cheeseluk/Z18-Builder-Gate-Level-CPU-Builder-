@@ -12,9 +12,9 @@
 # last settled values, so only what changes moves. The wave numbers of
 # the changes are what the animation plays.
 
-from zb_values import Z, X, isKnown
+from zb_values import Z, X
 from zb_parts import PRIMITIVES, copyState
-from zb_circuit import getDefinition, partLayout, nodeKey
+from zb_circuit import getDefinition, partLayout
 
 MAX_PHASES = 20000
 MAX_DEPTH = 12                 # parts inside parts inside ...

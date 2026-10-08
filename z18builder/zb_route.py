@@ -11,8 +11,8 @@
 
 import heapq
 from zb_parts import GRID
-from zb_circuit import (computeNets, wirePoints, partBounds, partLayout,
-                        endPosition, endSide, findWire, findPart, nodeKey)
+from zb_circuit import (computeNets, wirePoints, partBounds, endPosition,
+                        endSide, findWire, nodeKey)
 
 BEND = 4
 CROSS = 6

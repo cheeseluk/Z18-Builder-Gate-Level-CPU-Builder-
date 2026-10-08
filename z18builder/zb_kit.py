@@ -15,11 +15,10 @@ for folder in [PROJECT_DIR, os.path.join(PROJECT_DIR, 'z18100')]:
 
 import z18_cpu
 from z18_assembler import isInstruction
-from zb_values import Z, X, isKnown, formatValue
-from zb_parts import PRIMITIVES
+from zb_values import X, isKnown, formatValue
 from zb_circuit import makeLibrary, makeCircuit, addPart, addWire, \
-    addJunction, findPart
-from zb_sim import findTagged, taggedValues, describePrim
+    addJunction
+from zb_sim import findTagged, taggedValues
 
 # The palette, one tab per level
 PALETTE = [('Gates', ['NOT', 'BUF', 'AND', 'OR', 'NAND', 'NOR', 'XOR', 'TG',
