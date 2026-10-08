@@ -29,7 +29,9 @@ import math
 import importlib
 from cmu_graphics import *
 from zb_helpers import (SCALE as SCREEN_SCALE, DESIGN_WIDTH, DESIGN_HEIGHT,
-                        MIN_SCALE, BAR_COLOR, startSize)
+                        MIN_SCALE, startSize)
+
+BAR_COLOR = rgb(12, 13, 17)         # fills the window around the picture
 
 # Screen pixels per design unit, and where the picture's top-left corner
 # is in the window. It starts as the display scaling (zb_helpers.SCALE).

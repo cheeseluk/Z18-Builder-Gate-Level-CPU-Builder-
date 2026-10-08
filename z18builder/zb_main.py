@@ -419,9 +419,6 @@ def afterSimChange(app):
 # app.settling is True when the waves are from clicking an IN pin
 # (they settle but no clock edge follows).
 
-# app.frozen is True after Pause: the animation stops where it is, mid
-# wave (or mid flash), until Run (or n, p, space) carries on.
-
 # app.frozen is True after Pause: everything stops where it is (mid wave,
 # mid flash, between table rows) until Resume carries on with whatever
 # was ordered (a wave, a phase, an instruction, a run, the table).
@@ -468,14 +465,6 @@ def pauseOrResume(app):
                  'space step from here.')
         return True
     return False
-    app.frozen = False
-
-def freeze(app):
-    # Pause: stop right here (if something is moving)
-    app.frozen = app.stage != IDLE
-
-def unfreeze(app):
-    app.frozen = False
 
 def startWaves(app):
     # The settle's last wave changes nothing (that is how it knows it is

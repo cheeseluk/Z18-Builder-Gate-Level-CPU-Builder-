@@ -1,11 +1,10 @@
 # zb_helpers.py
-# The small pieces the builder used to borrow from the parent project:
-#   - display scaling and the window's start size (was ../scaled_draw.py)
-#   - polyline geometry for wires and packets (was ../datapath.py)
-# No drawing in this file.
+# Two small helpers the other modules share:
+#   - display scaling and the window's start size
+#   - polyline geometry for wires and packets
+# No graphics in this file, so the model can use it without a window.
 
 import ctypes
-from cmu_graphics import *
 
 
 ######################################################################
@@ -26,7 +25,6 @@ SCALE = getScreenScale()
 DESIGN_WIDTH = 1440
 DESIGN_HEIGHT = 810
 MIN_SCALE = 0.25
-BAR_COLOR = rgb(12, 13, 17)
 SCREEN_FILL = (0.92, 0.85)      # most a new window takes of the screen
 
 def startSize(designWidth=DESIGN_WIDTH, designHeight=DESIGN_HEIGHT):
@@ -42,7 +40,7 @@ def startSize(designWidth=DESIGN_WIDTH, designHeight=DESIGN_HEIGHT):
                   SCREEN_FILL[1] * screenHeight / height)
     except Exception:
         pass
-    return rounded(width * fit), rounded(height * fit)
+    return int(width * fit + 0.5), int(height * fit + 0.5)
 
 
 ######################################################################

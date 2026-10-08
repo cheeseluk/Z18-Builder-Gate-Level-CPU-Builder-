@@ -1,55 +1,82 @@
-z18builder/ · architecture reference
-
 # Z18 Builder Architecture
 
 Z18 Builder is a teaching app for CMU 18-100's Z18100, an 8-bit CPU with 16 words of memory. Students wire a computer from parts, run a `.z18` program on it, and watch the logic settle wave by wave. At each clock edge, the machine they built is compared against the lecture's bit-level reference model.
 
-- **17** Python modules
-- **\~13,900** lines
+- **17** Python modules (14 in `z18builder/`, 3 in `z18100/`), plus a 69-test suite
+- **\~14,400** lines, not counting the tests
 - **29** built-in parts
 - **15** missions
 - Runtime: **cmu_graphics** on pygame
 
-1. [Layers](#layers)
-2. [Golden model](#golden)
-3. [Data model](#data)
-4. [Simulation engine](#sim)
-5. [One phase, end to end](#phase)
-6. [Parts made of parts](#library)
-7. [Kit and lecture check](#kit)
-8. [Missions](#missions)
-9. [Explanations and routing](#helpers)
-10. [Rendering](#render)
-11. [Controller and view](#ui)
-12. [Persistence and caching](#state)
-13. [Gaps](#gaps)
-14. [Module index](#index)
+1. [Layers and who imports whom](#1-layers-and-who-imports-whom)
+2. [The golden model](#2-the-golden-model)
+3. [Data model](#3-data-model)
+4. [The simulation engine](#4-the-simulation-engine)
+5. [One phase, end to end](#5-one-phase-end-to-end)
+6. [Parts made of parts](#6-parts-made-of-parts)
+7. [The kit and the lecture check](#7-the-kit-and-the-lecture-check)
+8. [Missions](#8-missions)
+9. [Explanations and routing](#9-explanations-and-routing)
+10. [Rendering](#10-rendering)
+11. [Controller and view](#11-controller-and-view)
+12. [Persistence and caching](#12-persistence-and-caching)
+13. [Module index](#13-module-index)
 
-## 01Layers and who calls whom
+## 1. Layers and who imports whom
 
-One rule shapes the code: **only four modules know about graphics.** Everything else is plain dicts and lists with no graphics imports. That keeps snapshots, JSON files and undo cheap, and lets the model run without a window (mission checks, verification, tests).
+One rule shapes the code: **only three modules import cmu_graphics**: `zb_paint` (the only code that draws), `zb_view` (decides what to draw) and `zb_main` (the app and its events). Everything else is plain dicts and lists. That keeps snapshots, JSON files and undo cheap, and lets the model run without a window (mission checks, verification, the test suite). `zb_editor` is part of the controller, but it never draws, so the tests drive it with a stand-in app object.
 
-**Arrows point from caller to callee, and they only ever point down or left.** In the model row, each module imports the ones to its left. The blue path is the one that runs every clock phase. The dashed arrow is the view reading values; it never changes the sim. `zb_main` also calls `z18_assembler` to load the chosen program (not drawn).\
-imports cmu_graphicspure data and logiclecture code, read-only
+```mermaid
+flowchart TB
+    subgraph GFX["Imports cmu_graphics"]
+        main[zb_main] --> view[zb_view] --> paint[zb_paint]
+    end
+    subgraph CTRL["Controller, no drawing"]
+        editor[zb_editor]
+    end
+    subgraph MODEL["Model: pure data and logic"]
+        missions[zb_missions] --> kit[zb_kit] --> library[zb_library] --> sim[zb_sim] --> circuit[zb_circuit] --> parts[zb_parts] --> values[zb_values]
+        kit --> explain[zb_explain]
+        route[zb_route] --> circuit
+        helpers[zb_helpers]
+    end
+    subgraph LECTURE["z18100/: lecture code, read-only"]
+        asm[z18_assembler] --> isa[z18_isa]
+        cpu[z18_cpu] --> isa
+    end
+    main --> editor
+    view --> editor
+    editor --> missions
+    editor --> route
+    paint --> helpers
+    sim -.->|"stop details, imported inside a function"| explain
+    parts --> cpu
+    kit --> cpu
+    explain --> asm
+```
 
-The builder imports `z18100/` and the shared `scaled_draw.py` by appending them to `sys.path` (at the top of `zb_parts`, `zb_kit` and `zb_main`). It never modifies them. The style is the same throughout: no classes, camelCase names, a short comment on every function, and `#####` section banners.
+**Arrows point from the importer to the module it imports, and at module level they only point down:** graphics, then controller, then model, then lecture code. Not every import is drawn: `zb_main` and `zb_view` read from most of the model, and `zb_main` calls `z18_assembler` to load the chosen program. The one loop, between `zb_sim` and `zb_explain`, is made of imports inside functions on both sides, so neither module needs the other to load.
 
-## 02The golden model
+The builder reaches `z18100/` by appending it to `sys.path` (at the top of `zb_parts`, `zb_kit`, `zb_main` and `test_zb`). It never modifies those files. The style is the same throughout: no classes, camelCase names, a short comment on every function, and `#####` section banners.
 
-`z18100/z18_cpu.py` simulates the lecture's CPU down to single bits. Memory is 16 × 8 bits, where `None` means uninitialized (`xxxxxxxx`). The registers are `pc`, `ir`, `r0`–`r3`, `muxReg`, `a`, `b` and `out`, plus the flags `n z o`.
+## 2. The golden model
+
+`z18100/z18_cpu.py` simulates the lecture's CPU down to single bits. Memory is 16 × 8 bits, where `None` means uninitialized (`xxxxxxxx`). The registers are `pc`, `ir`, `r0`–`r3`, `muxReg`, `a`, `b` and `out`, plus the flags `n z o`. It follows [`z18100/z18100_cpu_spec.md`](z18100/z18100_cpu_spec.md), a written specification of the machine taken from lectures 06 and 07.
 
 - **Two phases per instruction.** In *fetch* (CLK = 0) the PC drives the address bus and `IR ← M[PC]`. In *execute* (CLK = 1), `IR[3:0]` drives the address bus and a 4→10 decoder turns `IR[7:4]` into control lines.
 - **Built from gates.** `notGate`, `andGate`, `xorGate`, `transmissionGate`, `fullAdder`, `runAdder` (ripple carry, with XOR inversion to subtract), `runMux` and `decoderOutput`.
 - **Compute, then commit.** `computeSignals(cpu)` works out every wire for the next phase without changing anything. `stepPhase` commits it, which is the clock edge.
 - **Stops.** The machine halts when the PC passes 15, when the IR holds `xxxxxxxx`, or on an undefined op code (10–15). It stops with an error when any latch would load `xxxxxxxx`.
 
+The instruction set is one table in `z18_isa.py`: each op code with its lecture syntax, its short form for the RAM table and a description. The CPU and the assembler both read it, so changing an instruction means changing one row. A program can also declare extra instructions (`.instruction 1010 Jump x = PC <- x`) for a machine built with a bigger decoder.
+
 `z18_assembler.py` turns lecture-syntax assembly (`Load R2, M13`, `MUX R3`, `Jump-if-not-negative M1`, raw words, `data -3`, `13:` address prefixes) into 16 words, and disassembles words for the RAM table and the narration. Six demo programs live in `z18100/programs/`: `lecture_loop`, `fibonacci`, `flags`, `max`, `self_modify` and `uninit_error`.
 
-## 03Data model
+## 3. Data model
 
 ### Values
 
-A net is a group of connected wires. It carries an int from `0` to `2width − 1`, `Z` (nothing drives it) or `X` (unknown). `Z` and `X` apply to the **whole net**, never to single bits. That's much simpler, at one cost: an 8-bit latch built from gates only stops being `X` once every bit is known.
+A net is a group of connected wires. It carries an int from `0` to `2^width − 1`, `Z` (nothing drives it) or `X` (unknown). `Z` and `X` apply to the **whole net**, never to single bits. That's much simpler, at one cost: an 8-bit latch built from gates only stops being `X` once every bit is known.
 
 ### Primitive parts
 
@@ -87,7 +114,7 @@ library  = {user: {name: compositeDef}, recipes, recipeStates, version, cache}
 - Junction clean-up.
 - `wireGeometry`: crossings with hop paths, overlaps, branch dots, and wires under parts. It runs once per edit, never per frame.
 
-## 04The simulation engine
+## 4. The simulation engine
 
 ### Flattening
 
@@ -111,17 +138,28 @@ Like the golden model, each phase is computed first and then committed. `beginPh
 
 Each phase saves a snapshot of every prim's state. If the circuit has gate loops, the snapshot also keeps net values, because a latch built from gates stores its bit on its wires. `goToStep(k)` restores state *k−1*, settles phase *k* so the wires show what they carried during it, then restores state *k* so the registers show what they loaded at its edge.
 
-## 05One phase, end to end
+## 5. One phase, end to end
 
-Run mode replays a phase that has already been computed: the sim settles it, then the UI animates its waves, then the clock edge commits it. `app.stage` records where the animation is, and `app.goal` (`wave`, `phase`, `instr` or `run`) records how far the user asked it to go.
+Run mode replays a phase that has already been computed: the sim settles it, then the UI animates its waves, then the clock edge commits it. `app.stage` records where the animation is (`IDLE`, `WAVES` or `EDGE`), and `app.goal` (`wave`, `phase`, `instr` or `run`) records how far the user asked it to go.
 
-**The machine changes only on the commitPhase transition; everything else replays a settled result.** Dotted lines show the work each transition does in the sim and in the lecture check. Space sets the goal to `instr`, so after a fetch edge it loops straight back into WAVES for execute. Pause sets `frozen`, which stops all three states where they are. **To end** (`e`) skips the animation and calls `beginPhase` and `endPhase` in a plain loop.
+```mermaid
+stateDiagram-v2
+    [*] --> IDLE
+    IDLE --> WAVES : startPhase calls beginPhase, which settles the phase
+    WAVES --> WAVES : next wave (goal wave waits at the end of each one)
+    WAVES --> EDGE : commitPhase calls endPhase, then the lecture check
+    WAVES --> IDLE : last wave of a pin click (settling, no clock edge)
+    EDGE --> WAVES : finishEdge, goal instr after a fetch, or goal run
+    EDGE --> IDLE : finishEdge, goal reached, halted or at a breakpoint
+```
 
-Clicking an IN pin or a truth-table row also enters WAVES, with `settling = True`. Those waves animate the logic but never reach a clock edge. A circuit with no CLOCK runs in **logic mode**: it settles at once, the truth table opens on the side, and Run plays the table one row at a time.
+**The machine changes only in `commitPhase`; everything else replays a settled result.** Space sets the goal to `instr`, so after a fetch edge it loops straight back into `WAVES` for execute. Pause sets `app.frozen`, which stops all three states where they are. **To end** (`e`) skips the animation and calls `beginPhase` and `endPhase` in a plain loop.
+
+Clicking an IN pin or a truth-table row also enters `WAVES`, with `settling = True`. Those waves animate the logic but never reach a clock edge. A circuit with no CLOCK runs in **logic mode**: it settles at once, the truth table opens on the side, and Run plays the table one row at a time.
 
 Animation timing follows the wall clock, not the number of frames drawn (`elapsedFrames`), so a slow frame on a big machine doesn't slow the playback. At 1× speed a wave takes 14 frames, and the speed dial runs from 0.05× to 7×.
 
-## 06Parts made of parts
+## 6. Parts made of parts
 
 A user part is a composite definition: `{name, circuit, implements, verified, stateful, size, …}`. Its ports are the IN and OUT pins inside its circuit. `zb_library.py` handles them:
 
@@ -131,7 +169,7 @@ A user part is a composite definition: `{name, circuit, implements, verified, st
 - **Stateful parts** (a register, RAM, or a gate loop anywhere inside) can't have a truth table and never run fast. Memory missions check them with step tables instead.
 - **Looking inside while running** (`innerView`): a user part that was flattened shares the live sim at a path prefix, so the animation runs inside it too. A built-in shows its recipe in a one-off tester, fed the part's current port values and its stored state. Opening the PC, for example, shows its COUNTER holding the PC's value.
 
-## 07The kit and the lecture check
+## 7. The kit and the lecture check
 
 `zb_kit.py` connects the generic engine to the specific lecture machine.
 
@@ -139,9 +177,9 @@ A user part is a composite definition: `{name, circuit, implements, verified, st
 - **Recipes** are read-only circuits showing what's inside each built-in, matching the golden model gate for gate. The ALU recipe, for example, is eight FULLADDs with XOR inversion. Pressing `c` copies a recipe into an editable part.
 - **The lecture machine** is built in code by `makeReferenceMachine()`, using a small DSL (`put`, `dot`, `link('a.port', '*junction', via, lamp)`). The data bus runs along the top, the address bus under the RAM, and the decoder's rails along the bottom. It's the first-launch circuit, and missions 10–14 start from it with parts removed.
 - **Halt rules** (`z18Rule`) apply the golden model's stops to the tagged PC and IR. Loading `X` into a register is an error, except into the IR, because fetching `xxxxxxxx` halts on the next phase anyway.
-- **The lecture check** runs a `z18_cpu` alongside the student's machine. After each phase, `checkerStep` advances it to the same phase count and `compareWithGolden` reports the first difference: the tagged registers in a fixed order, then memory, then halt status. `goldenWhy` explains it: whether the register's WE was on, what drove its `d` input, and when the lecture machine loads that register.
+- **The lecture check** runs a `z18_cpu` alongside the student's machine. After each phase, `checkerStep` advances it to the same phase count and `compareWithGolden` reports the first difference: the tagged registers in a fixed order, then memory, then halt status. `goldenWhy` explains it: whether the register's WE was on, what drove its `d` input, and when the lecture machine loads that register (from the spec's sections 2.3–2.10).
 
-## 08Missions
+## 8. Missions
 
 The 15 missions are declarative dicts. Each one has a starting circuit, a whitelist of allowed parts, and a check. `checkMissionDetail` runs every check in the same order (wiring errors, then disallowed parts, then the mission's own check) and returns enough detail for the UI to open the table straight on the failing row.
 
@@ -153,7 +191,7 @@ The 15 missions are declarative dicts. Each one has a starting circuit, a whitel
 
 Finishing a Parts or Memory mission puts a verified copy in My parts. Progress is saved in `parts/progress.json` by mission id, so renumbering missions loses nothing.
 
-## 09Explanations and routing
+## 9. Explanations and routing
 
 ### zb_explain
 
@@ -163,15 +201,15 @@ Every problem in the app has the same shape: `{level, code, text, why[], fix, pa
 
 An A\* search on the 10-unit grid, where each state is `(cell, direction)`. A wire can't pass through parts or run along another net's wire, and it must leave and enter each port in the direction the port faces. Costs: 1 per cell (0.5 along its own net, so wires share trunks), 4 per bend, 6 per crossing, 1 next to a part. The search first looks within 15 cells of the two ends, then widens to the whole circuit, and gives up after 60,000 states. `tidyWires` reroutes wires one at a time, biggest net first, and makes a second pass that routes the first pass's failures first.
 
-## 10Rendering
+## 10. Rendering
 
-All drawing goes through five functions in `zb_paint.py`: `scaledRect`, `scaledLine`, `scaledCircle`, `scaledPolygon` and `scaledLabel`, plus clipping. They take **design units**: the layout is always 1440 × 810 (16:9), scaled to fit the window and centered, with bars filling the rest. The process declares itself DPI-aware, so text stays sharp at 125% and 150% Windows scaling.
+All drawing goes through five functions in `zb_paint.py`: `scaledRect`, `scaledLine`, `scaledCircle`, `scaledPolygon` and `scaledLabel`, plus clipping. They take **design units**: the layout is always 1440 × 810 (16:9), scaled to fit the window and centered, with bars filling the rest. The process declares itself DPI-aware (`zb_helpers`), so text stays sharp at 125% and 150% Windows scaling.
 
-- **Fast backend (the default).** Each frame is drawn straight onto one offscreen surface with cmu_graphics's internal renderer (`deps.wyvern`). The surface replaces a cached image, which is shown with a single `drawImage`. This avoids cmu_graphics creating one object per draw call.
+- **Fast backend (the default).** Each frame is drawn straight onto one offscreen surface with cmu_graphics's internal renderer (`deps.wyvern`). The surface replaces a cached image, which is shown with a single `drawImage`. This avoids cmu_graphics creating one object per draw call. It needs Pillow for the one-time image it draws into.
 - **Screen copy.** cmu_graphics's `App.redrawAll` is patched so pygame copies the frame without alpha blending (RGBX instead of RGBA). The code comment puts this at about 13 ms → under 1 ms per frame.
-- **Fallback.** If any of these internals fail, the backend prints why and switches to plain `drawRect` / `drawLabel` calls. `ZB_DRAW=shapes` forces that.
+- **Fallback.** If any of these internals fail (Pillow missing, or a cmu_graphics release that changes them), the backend prints why and switches to plain `drawRect` / `drawLabel` calls. `ZB_DRAW=shapes` forces that. The app still works, just more slowly, so a cmu_graphics upgrade is the most likely cause of a sudden slowdown.
 
-## 11Controller and view
+## 11. Controller and view
 
 cmu_graphics gives the program one `app` object. `initAppFields` sets about 80 fields on it:
 
@@ -203,9 +241,9 @@ Every edit ends in `afterEdit`, which:
 
 ### zb_main: the app controller
 
-- **Startup:** builds the library, loads saved parts, then opens the autosave (or builds the lecture machine).
+- **Startup:** turns off cmu_graphics's model/view checker (see zb_view below), builds the library, loads saved parts, then opens the autosave (or builds the lecture machine).
 - **Tab into Run:** validates, flattens, attaches the kit, loads the program into the RAM tagged `mem`, and turns on the lecture check if any part is tagged.
-- **The animation** shown in section 05.
+- **The animation** shown in section 5.
 - **Narration:** one sentence for each part whose output changed in the current wave, such as "MUX passes input 2 because sel = 10".
 - **Pickers** (pop-up lists) for programs, files, missions, presets and verify targets.
 - **Events:** mouse clicks are dispatched by screen region. Overlays come first, then breadcrumbs, the toolbar, the timeline or palette, the side panel, the warnings bar, and finally the canvas. The mouse wheel comes in through a raw pygame hook, because cmu_graphics has no wheel event.
@@ -213,13 +251,14 @@ Every edit ends in `afterEdit`, which:
 
 ### zb_view: drawing only
 
-- Each frame starts by copying `app`'s fields into a plain namespace (reading cmu's `app` is slow, and it can't be written while drawing). Camera and per-level data are cached for the frame.
+- Each frame starts by copying `app`'s fields into a plain namespace, because reading cmu's `app` is slow. Camera and per-level data are cached for the frame.
+- The per-level cache (`app.levelCache`) and the wire-flow cache are filled in place while drawing. cmu_graphics 2.0.5 added a check that hashes the whole app state before and after `redrawAll` and stops the program if anything changed, so `zb_main` sets `app.disableMvcChecker = True`. That also saves hashing the app state twice a frame.
 - `findLevelInfo` maps each net on the level on screen to its sim net, using the view's path prefix.
 - A wire is *dim*, *moving*, *lit* or *unknown*. A shortest-path search from the net's active driver makes the value spread outward along the wires, carrying a value "packet".
 - Each part is drawn by a routine for its shape. The RAM is drawn as a live 16-row table with bits you can click and breakpoints.
 - Hovering a part lights the parts feeding it in green and the parts it feeds in pink.
 
-## 12Persistence and caching
+## 12. Persistence and caching
 
 | Path | Holds | Written |
 | --- | --- | --- |
@@ -227,6 +266,8 @@ Every edit ends in `afterEdit`, which:
 | `circuits/<name>.json` | Saved circuits (`version: 1`) | Save, ctrl+S |
 | `parts/<name>.json` | One user part: definition plus circuit | On edit, pack, verify, mission reward |
 | `parts/progress.json` | Missions completed | On mission success |
+
+`circuits/z18100_reference.json` is the one saved circuit in the repository: the lecture machine as a file, which a test keeps identical to `makeReferenceMachine()`. The autosave and `parts/` are git-ignored.
 
 Caches are invalidated by **version counters**, not dirty flags:
 
@@ -236,32 +277,27 @@ Caches are invalidated by **version counters**, not dirty flags:
 
 Anything expensive is computed once per edit, never once per frame.
 
-## 13Gaps found while reading
-
-- missing`test_zb.py` is described in the README ("every demo program in lockstep with z18_cpu") but isn't in the tree. `zb_kit.expandToGates` is never called from the app and probably belonged to it.
-- missingComments refer to `z18100/z18100_cpu_spec.md`, `z18_view.py`, `z18_layout.py`, `z18_main.py` and `../datapath.py`, none of which are here. The in-app "why" text points students at the spec file.
-- repoThe enclosing git repository's root is the home folder and has no commits, so this project isn't under version control.
-- fragileThe fast renderer depends on cmu_graphics internals. It falls back safely, but a cmu_graphics upgrade is the most likely cause of a sudden slowdown.
-- tidyIn `zb_main.py`: an unreachable line after a `return` in `pauseOrResume`, unused `freeze` / `unfreeze`, a duplicated comment about `frozen`, and an unused `USER_SHAPES` import.
-
-## 14Module index
+## 13. Module index
 
 | Module | Lines | Role |
 | --- | --- | --- |
+| `z18100/z18_isa.py` | 171 | The instruction table: op codes, syntax, descriptions, declared instructions |
 | `z18100/z18_cpu.py` | 480 | Golden model: bit-level reference CPU |
-| `z18100/z18_assembler.py` | 346 | Assembly ↔ memory words; disassembly for the UI |
-| `scaled_draw.py` | 154 | DPI scale and design-unit constants, shared with other apps |
+| `z18100/z18_assembler.py` | 626 | Assembly ↔ memory words; disassembly for the UI |
 | `zb_values.py` | 63 | Signal values (ints, Z, X) and formatting |
+| `zb_helpers.py` | 133 | Display scaling and window size; polyline geometry for packets, hit-tests and bit lanes |
 | `zb_parts.py` | 975 | Every primitive: ports, behaviour, state; bus notation |
 | `zb_circuit.py` | 1,037 | Circuit data, nets, validation, wire geometry, JSON |
 | `zb_sim.py` | 788 | Flatten, settle in waves, clock edge, history, loops |
 | `zb_library.py` | 629 | User parts: pack, test, truth tables, verify, look inside |
-| `zb_kit.py` | 792 | Palette, recipes, lecture machine, run rules, golden check |
-| `zb_missions.py` | 643 | The 15 missions and their checks |
-| `zb_explain.py` | 366 | Why a value is x / Z / wrong; stop details |
+| `zb_kit.py` | 793 | Palette, recipes, lecture machine, run rules, golden check |
+| `zb_missions.py` | 649 | The 15 missions and their checks |
+| `zb_explain.py` | 367 | Why a value is x / Z / wrong; stop details |
 | `zb_route.py` | 360 | A\* wire router and Tidy |
-| `zb_paths.py` | 90 | Polyline geometry for packets, hit-tests and bit lanes |
-| `zb_editor.py` | 1,712 | Build-mode actions, camera, undo, files |
-| `zb_main.py` | 2,380 | Setup, modes, animation, events, pickers, narration |
-| `zb_view.py` | 2,735 | Draws everything |
-| `zb_paint.py` | 382 | Drawing backend: fast offscreen path, window scaling |
+| `zb_editor.py` | 1,773 | Build-mode actions, camera, undo, files |
+| `zb_main.py` | 2,397 | Setup, modes, animation, events, pickers, narration |
+| `zb_view.py` | 2,747 | Draws everything |
+| `zb_paint.py` | 383 | Drawing backend: fast offscreen path, window scaling |
+| `test_zb.py` | 2,430 | 69 tests, run without a window: `python z18builder/test_zb.py` |
+
+`z18100/z18100_cpu_spec.md` is the written specification of the Z18100 that the golden model and the lecture check's explanations follow.

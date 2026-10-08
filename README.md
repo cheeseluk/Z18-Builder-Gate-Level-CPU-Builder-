@@ -64,7 +64,7 @@ The code keeps a strict **model/view split**:
 
 | Layer | Files | Role |
 |---|---|---|
-| Model (no graphics) | `zb_values`, `zb_parts`, `zb_circuit`, `zb_sim`, `zb_library`, `zb_kit`, `zb_missions`, `zb_explain`, `zb_route` | Values, parts, circuits, simulation, user parts, the lecture machine, missions, explanations, routing |
+| Model (no graphics) | `zb_values`, `zb_parts`, `zb_circuit`, `zb_sim`, `zb_library`, `zb_kit`, `zb_missions`, `zb_explain`, `zb_route`, `zb_helpers` | Values, parts, circuits, simulation, user parts, the lecture machine, missions, explanations, routing, display scaling and wire geometry |
 | View / controller | `zb_editor`, `zb_view`, `zb_paint`, `zb_main` | Build-mode actions, drawing, the rendering backend, app setup, modes, animation and events |
 | Reference | `z18100/` | The ISA table, the assembler and the golden-model CPU |
 
