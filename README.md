@@ -87,12 +87,12 @@ flowchart LR
 
 ## Getting started
 
-Developed and tested on **Python 3.14** with **cmu-graphics 2.0**.
+Developed on **Python 3.14** and tested with **cmu-graphics 2.0.3 and 2.0.5**. The fast renderer also needs **Pillow**; without it the app still runs, just slower.
 
 ```
 git clone https://github.com/cheeseluk/Z18-Builder-Gate-Level-CPU-Builder-.git
 cd Z18-Builder-Gate-Level-CPU-Builder-
-pip install cmu-graphics
+pip install -r requirements.txt
 python z18builder/zb_main.py
 ```
 

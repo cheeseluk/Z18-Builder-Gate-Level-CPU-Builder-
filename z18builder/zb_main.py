@@ -99,6 +99,10 @@ NARRATION_CHARS = 165
 def onAppStart(app):
     app.stepsPerSecond = FRAME_RATE
     app.inspectorEnabled = False       # ctrl is used for shortcuts
+    # The view fills per-frame caches on app while drawing, which
+    # cmu-graphics 2.0.5+ would reject; its check also hashes the whole app
+    # state twice a frame
+    app.disableMvcChecker = True
     library = makeLibrary()
     attachRecipes(library)
     errors = loadUserParts(library, PARTS_DIR)
