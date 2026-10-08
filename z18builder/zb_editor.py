@@ -6,7 +6,8 @@
 import os
 import copy
 import json
-from zb_parts import (PRIMITIVES, GRID, checkParams, parseRanges, parseWidths)
+from zb_parts import (PRIMITIVES, GRID, STATEFUL_TYPES, checkParams,
+                      parseRanges, parseWidths)
 from zb_circuit import (getDefinition, partLayout, partBounds, addPart,
                         addWire, findPart, findWire, findJunction, removePart,
                         removeJunction, splitWire, wirePoints, movePart,
@@ -492,13 +493,25 @@ def refreshView(app):
     app.view = view
     app.viewVersion += 1
 
+def noInsideMessage(app, part):
+    # Why a part has no inside to open. Parts that remember are made of
+    # smaller parts, but the builder simulates them as one block.
+    label = getDefinition(app.library, part['type'])['label']
+    if part['type'] == 'DFF':
+        return (f'{label} is simulated as one block. Missions 6-8 build one '
+                'from gates: an SR latch, a D latch, then two D latches in '
+                'a row')
+    if part['type'] in STATEFUL_TYPES:
+        return (f'{label} is simulated as one block, so there is no inside '
+                'to show')
+    return (f'{label} is one of the smallest parts in the builder: there '
+            'is nothing inside it to show')
+
 def drillIn(app, partId):
     part = findPart(getCircuit(app), partId)
     circuit, readOnly = getInnerCircuit(app.library, part)
     if circuit == None:
-        definition = getDefinition(app.library, part['type'])
-        return say(app, f"{definition['label']} is atomic: it has no parts "
-                        'inside to show')
+        return say(app, noInsideMessage(app, part))
     app.path.append(partId)
     app.selection = emptySelection()
     cancelTool(app)

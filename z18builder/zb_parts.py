@@ -450,6 +450,25 @@ def loadProblem(inputs):
 def problemRegister(params, inputs, state):
     return loadProblem(inputs)
 
+def layoutFlipFlops(params):
+    # A register without WE (what is inside REG, behind its MUX)
+    bits = params['width']
+    width = registerWidth(bits)
+    return width, 40, [makePort('d', 'in', bits, 0, 20),
+                       makePort('q', 'out', bits, width, 20)]
+
+def commitFlipFlops(params, inputs, state):
+    # No WE: every clock edge loads d
+    return passValue(inputs['d'])
+
+def problemFlipFlops(params, inputs, state):
+    # Loading x is only a problem when it loses a known value: inside a
+    # REG, holding means loading q again, and a REG may hold x (the IR
+    # does until its first fetch)
+    if not isKnown(inputs['d']) and isKnown(state):
+        return 'would load ' + 'x' * 8
+    return None
+
 def layoutCounter(params):
     bits = params['width']
     width = registerWidth(bits)
@@ -721,6 +740,14 @@ def makePrimitives():
                        'phase it loads d if WE = 1, and holds otherwise.',
                        initState=initRegister, commit=commitRegister,
                        problem=problemRegister),
+        makeDefinition('DFF', 'D-FF', 1, 'register',
+                       {'width': 8, 'init': '0'}, layoutFlipFlops,
+                       evalRegister,
+                       'D flip-flops, one per bit: at the end of every '
+                       'clock phase they load d. Missions 6-8 build one '
+                       'from gates.',
+                       initState=initRegister, commit=commitFlipFlops,
+                       problem=problemFlipFlops),
         makeDefinition('COUNTER', 'CNT', 1, 'register', {'width': 8},
                        layoutCounter, evalCounter,
                        'A register that can count: WE = 1 loads d, '
@@ -766,7 +793,8 @@ def makePrimitives():
 PRIMITIVES = makePrimitives()
 
 # The ports whose outputs may float, and the parts holding state
-STATEFUL_TYPES = {'REG', 'COUNTER', 'RAM', 'IR', 'PC', 'FLAGS', 'CLOCK'}
+STATEFUL_TYPES = {'REG', 'DFF', 'COUNTER', 'RAM', 'IR', 'PC', 'FLAGS',
+                  'CLOCK'}
 
 
 def copyState(state):
@@ -968,7 +996,7 @@ def checkParams(typeName, params):
     if typeName in ['PIN_IN', 'PIN_OUT'] and params.get('side', 'auto') \
             not in ['auto', 'left', 'right', 'top', 'bottom']:
         return 'side must be auto, left, right, top or bottom'
-    if typeName == 'REG' and params['init'] not in ['0', 'X']:
+    if typeName in ['REG', 'DFF'] and params['init'] not in ['0', 'X']:
         return 'init must be 0 or X'
     if typeName == 'REG' and params['ports'] not in ['side', 'top']:
         return 'ports must be side or top'

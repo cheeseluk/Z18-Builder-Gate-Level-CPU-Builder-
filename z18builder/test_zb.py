@@ -602,6 +602,100 @@ def testInnerView():
     endPhase(sim)
     print('Passed!')
 
+def innerNetValue(view, typeName, port):
+    # The value on a port of the one part of this type inside a view
+    part = [p for p in view['circuit']['parts'] if p['type'] == typeName][0]
+    sim = view['sim']
+    return sim['nets'][sim['nodeNet'][('port', (part['id'],), port)]][
+        'value']
+
+def testInsideRegister():
+    print('Testing looking inside a running register...', end='')
+    library = newLibrary()
+    circuit = makeReferenceMachine()
+    sim = flatten(library, circuit)
+    attachKit(sim)
+    loadProgram(sim, readProgram('lecture_loop.z18'))
+    for i in range(13):                 # into Sub's execute phase
+        stepPhase(sim)
+    beginPhase(sim)
+    view = topView(circuit, sim)
+    # R2 holds b = 5 and its WE is off: the MUX feeds q back to the D-FF
+    r2 = [p for p in circuit['parts'] if p['ref'] == 'r2'][0]
+    inside = innerView(library, view, r2)
+    assert(inside['readOnly'])
+    ff = [p for p in inside['sim']['prims'] if p['label'] == 'D-FF'][0]
+    assert(ff['state'] == 5)
+    assert(innerNetValue(inside, 'DFF', 'q') == 5)
+    assert(innerNetValue(inside, 'MUX2', 'sel') == 0)
+    assert(innerNetValue(inside, 'DFF', 'd') == 5)       # it holds
+    # Two levels down: the IR's register opens too, with the IR's value
+    ir = [p for p in circuit['parts'] if p['type'] == 'IR'][0]
+    insideIR = innerView(library, view, ir)
+    reg = [p for p in insideIR['circuit']['parts'] if p['type'] == 'REG'][0]
+    insideReg = innerView(library, insideIR, reg)
+    ff = [p for p in insideReg['sim']['prims'] if p['label'] == 'D-FF'][0]
+    assert(ff['state'] == 0b01111111)
+    endPhase(sim)
+    print('Passed!')
+
+def testRegisterRecipe():
+    print('Testing the register recipe against the built-in REG...', end='')
+    library = newLibrary()
+    made = makeUserPart(library, 'my REG', RECIPES['REG'](
+        dict(PRIMITIVES['REG']['params'])))
+    circuit = makeCircuit('both')
+    addPart(library, circuit, 'PIN_IN', 0, 0, {'name': 'd', 'width': 8})
+    addPart(library, circuit, 'PIN_IN', 0, 100, {'name': 'we', 'width': 1})
+    builtIn = addPart(library, circuit, 'REG', 100, 0)
+    recipe = addPart(library, circuit, made['name'], 100, 100)
+    pins = {p['params']['name']: p['id'] for p in circuit['parts']
+            if p['type'] == 'PIN_IN'}
+    for part in [builtIn, recipe]:
+        for port in ['d', 'we']:
+            addWire(circuit, ['port', pins[port], 'out'],
+                    ['port', part['id'], port])
+    tester = makeTester(library, circuit)
+    sim = tester['sim']
+    def q(part):
+        return sim['nets'][sim['nodeNet'][('port', (part['id'],), 'q')]][
+            'value']
+    # Load, hold while d changes, load again, hold
+    for d, we, expected in [(0x5A, 1, 0x5A), (0x33, 0, 0x5A),
+                            (0x33, 1, 0x33), (0x11, 0, 0x33)]:
+        runTester(tester, {'d': d, 'we': we})
+        assert(beginPhase(sim))
+        endPhase(sim)
+        settle(sim)
+        assert(q(builtIn) == q(recipe) == expected), (d, we, q(recipe))
+    print('Passed!')
+
+def testFlipFlopProblems():
+    print('Testing when D flip-flops may load x...', end='')
+    dff = PRIMITIVES['DFF']
+    params = dict(dff['params'])
+    assert(dff['commit'](params, {'d': 7}, 0) == 7)     # no WE: it loads
+    # Holding x through a REG's MUX (like the IR before its first fetch)
+    # is fine; losing a known value to x is not
+    assert(dff['problem'](params, {'d': X}, X) == None)
+    assert('would load' in dff['problem'](params, {'d': X}, 5))
+    assert(checkParams('DFF', {'width': 8, 'init': '1'}) != None)
+    # The gate-level test machine keeps its registers whole
+    gates = expandToGates(newLibrary(), makeReferenceMachine())
+    assert(len([p for p in gates['parts'] if p['type'] == 'REG']) == 8)
+    print('Passed!')
+
+def testNoInsideMessages():
+    print('Testing what parts with no inside say...', end='')
+    app = types.SimpleNamespace(library=newLibrary())
+    def message(typeName):
+        return zb_editor.noInsideMessage(app, {'type': typeName})
+    assert('smallest' in message('AND'))
+    assert('one block' in message('RAM'))
+    assert('Missions 6-8' in message('DFF'))
+    assert(all('atomic' not in message(t) for t in PRIMITIVES))
+    print('Passed!')
+
 def testPalette():
     print('Testing the palette...', end='')
     for group, types in PALETTE:
@@ -2371,6 +2465,10 @@ def testAll():
     testGateLevelMachine()
     testPacking()
     testInnerView()
+    testInsideRegister()
+    testRegisterRecipe()
+    testFlipFlopProblems()
+    testNoInsideMessages()
     testPalette()
     testEditorActions()
     testWireBends()

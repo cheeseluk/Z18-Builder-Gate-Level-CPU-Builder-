@@ -353,17 +353,40 @@ def recipeFlags(params):
         link(b, 'r' + name + '.q', name + 'q.in')
     return b['circuit']
 
+def recipeRegister(params):
+    # WE is a MUX in front of D flip-flops that load at every clock edge:
+    # with we = 0 it feeds q back, so the edge loads the same value again
+    # (the register holds); with we = 1 it feeds d (the register loads)
+    width = params['width']
+    b = newBuild('Register')
+    putPin(b, 'd', 'in', 'd', width, 0, 30)
+    putPin(b, 'we', 'in', 'we', 1, 0, 110)
+    put(b, 'mux', 'MUX2', 100, 10, {'width': width})
+    put(b, 'ff', 'DFF', 180, 10, {'width': width,
+                                  'init': params.get('init', '0')},
+        label='D-FF')
+    putPin(b, 'q', 'out', 'q', width, 340, 20)
+    link(b, 'd.out', 'mux.in1')
+    link(b, 'we.out', 'mux.sel')
+    link(b, 'mux.out', 'ff.d')
+    link(b, 'ff.q', 'q.in')
+    # q back to the MUX, over the top so it doesn't run under the D-FF
+    link(b, 'ff.q', 'mux.in0', [[290, 30], [290, -20], [80, -20],
+                                [80, 20]])
+    return b['circuit']
+
 RECIPES = {'HALFADD': recipeHalfAdder, 'FULLADD': recipeFullAdder,
            'MUX2': recipeMux2, 'MUX4': recipeMux4, 'DEMUX': recipeDemux,
            'DECODER': recipeDecoder, 'ALU': recipeALU, 'IR': recipeIR,
-           'PC': recipePC, 'FLAGS': recipeFlags}
+           'PC': recipePC, 'FLAGS': recipeFlags, 'REG': recipeRegister}
 
 # How a stateful unit's state maps onto the registers in its recipe
 # (found by label)
 RECIPE_STATES = {'IR': lambda state: {'IR': state},
                  'PC': lambda state: {'PC': state},
                  'FLAGS': lambda state: {'N': state['n'], 'Z': state['z'],
-                                         'O': state['o']}}
+                                         'O': state['o']},
+                 'REG': lambda state: {'D-FF': state}}
 
 def attachRecipes(library):
     library['recipes'] = RECIPES
@@ -378,12 +401,14 @@ def expandToGates(library, circuit):
     # A copy of the circuit where every built-in part that has a recipe
     # is replaced by a user part made from the recipe, all the way down
     # to gates and registers. Adds those parts to the library.
+    # Registers stay whole: their recipe's D-FF is no closer to gates, and
+    # the lecture check reads the tagged registers' own state.
     import copy
     import json
     from zb_library import makeUserPart
     result = copy.deepcopy(circuit)
     for part in result['parts']:
-        if part['type'] not in RECIPES:
+        if part['type'] not in RECIPES or part['type'] == 'REG':
             continue
         key = json.dumps(part['params'], sort_keys=True)
         name = f"gates {part['type']} {key}"

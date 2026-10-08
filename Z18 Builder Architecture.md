@@ -2,9 +2,9 @@
 
 Z18 Builder is a teaching app for CMU 18-100's Z18100, an 8-bit CPU with 16 words of memory. Students wire a computer from parts, run a `.z18` program on it, and watch the logic settle wave by wave. At each clock edge, the machine they built is compared against the lecture's bit-level reference model.
 
-- **17** Python modules (14 in `z18builder/`, 3 in `z18100/`), plus a 69-test suite
+- **17** Python modules (14 in `z18builder/`, 3 in `z18100/`), plus a 73-test suite
 - **\~14,400** lines, not counting the tests
-- **29** built-in parts
+- **30** built-in parts
 - **15** missions
 - Runtime: **cmu_graphics** on pygame
 
@@ -80,7 +80,7 @@ A net is a group of connected wires. It carries an int from `0` to `2^width − 
 
 ### Primitive parts
 
-Each of the 29 built-ins in `zb_parts.py` is a definition dict. The Z18100 parts call the golden model's own functions (`runAdder`, `runMux`, `decoderOutput`), so they can't drift from the lecture's behaviour.
+Each of the 30 built-ins in `zb_parts.py` is a definition dict. The Z18100 parts call the golden model's own functions (`runAdder`, `runMux`, `decoderOutput`), so they can't drift from the lecture's behaviour.
 
 | Field | What it does |
 | --- | --- |
@@ -174,7 +174,8 @@ A user part is a composite definition: `{name, circuit, implements, verified, st
 `zb_kit.py` connects the generic engine to the specific lecture machine.
 
 - **Tags** (`ir`, `pc`, `r0`–`r3`, `muxReg`, `a`, `b`, `out`, `flags`, `mem`) link a placed part to a field of the golden model. The halt rules and the lecture check only look at tagged parts.
-- **Recipes** are read-only circuits showing what's inside each built-in, matching the golden model gate for gate. The ALU recipe, for example, is eight FULLADDs with XOR inversion. Pressing `c` copies a recipe into an editable part.
+- **Recipes** are read-only circuits showing what's inside each built-in, matching the golden model gate for gate. The ALU recipe, for example, is eight FULLADDs with XOR inversion, and the REG recipe is a MUX2 (WE picks: feed `q` back to hold, or `d` to load) in front of a D-FF, D flip-flops that load at every clock edge. Pressing `c` copies a recipe into an editable part. Parts without a recipe say why when opened: gates, pins and wiring are the smallest parts, and D-FF, COUNTER, RAM and CLOCK are simulated as one block. Missions 6–8 build a D flip-flop from gates.
+- **Down to gates.** `expandToGates` replaces every built-in that has a recipe with a part made from it, recursively, for a test that runs programs on the machine at gate level. Registers stay whole: their D-FF is no closer to gates, and the lecture check reads the tagged registers' own state.
 - **The lecture machine** is built in code by `makeReferenceMachine()`, using a small DSL (`put`, `dot`, `link('a.port', '*junction', via, lamp)`). The data bus runs along the top, the address bus under the RAM, and the decoder's rails along the bottom. It's the first-launch circuit, and missions 10–14 start from it with parts removed.
 - **Halt rules** (`z18Rule`) apply the golden model's stops to the tagged PC and IR. Loading `X` into a register is an error, except into the IR, because fetching `xxxxxxxx` halts on the next phase anyway.
 - **The lecture check** runs a `z18_cpu` alongside the student's machine. After each phase, `checkerStep` advances it to the same phase count and `compareWithGolden` reports the first difference: the tagged registers in a fixed order, then memory, then halt status. `goldenWhy` explains it: whether the register's WE was on, what drove its `d` input, and when the lecture machine loads that register (from the spec's sections 2.3–2.10).
@@ -286,18 +287,18 @@ Anything expensive is computed once per edit, never once per frame.
 | `z18100/z18_assembler.py` | 626 | Assembly ↔ memory words; disassembly for the UI |
 | `zb_values.py` | 63 | Signal values (ints, Z, X) and formatting |
 | `zb_helpers.py` | 133 | Display scaling and window size; polyline geometry for packets, hit-tests and bit lanes |
-| `zb_parts.py` | 975 | Every primitive: ports, behaviour, state; bus notation |
+| `zb_parts.py` | 1,003 | Every primitive: ports, behaviour, state; bus notation |
 | `zb_circuit.py` | 1,037 | Circuit data, nets, validation, wire geometry, JSON |
 | `zb_sim.py` | 788 | Flatten, settle in waves, clock edge, history, loops |
 | `zb_library.py` | 629 | User parts: pack, test, truth tables, verify, look inside |
-| `zb_kit.py` | 793 | Palette, recipes, lecture machine, run rules, golden check |
+| `zb_kit.py` | 818 | Palette, recipes, lecture machine, run rules, golden check |
 | `zb_missions.py` | 649 | The 15 missions and their checks |
 | `zb_explain.py` | 367 | Why a value is x / Z / wrong; stop details |
 | `zb_route.py` | 360 | A\* wire router and Tidy |
-| `zb_editor.py` | 1,773 | Build-mode actions, camera, undo, files |
+| `zb_editor.py` | 1,786 | Build-mode actions, camera, undo, files |
 | `zb_main.py` | 2,397 | Setup, modes, animation, events, pickers, narration |
 | `zb_view.py` | 2,747 | Draws everything |
 | `zb_paint.py` | 383 | Drawing backend: fast offscreen path, window scaling |
-| `test_zb.py` | 2,430 | 69 tests, run without a window: `python z18builder/test_zb.py` |
+| `test_zb.py` | 2,528 | 73 tests, run without a window: `python z18builder/test_zb.py` |
 
 `z18100/z18100_cpu_spec.md` is the written specification of the Z18100 that the golden model and the lecture check's explanations follow.
