@@ -415,7 +415,7 @@ DATA_BUS_Y = 30
 ADDR_BUS_Y = 450
 
 def placeReferenceParts(b):
-    # Laid out like the lecture's schematic (and ../z18100/z18_layout.py):
+    # Laid out like the lecture's schematic:
     # data bus on top, address bus below the RAM, decoder rails at the
     # bottom
     put(b, 'ram', 'RAM', 20, 60, ref='mem', label='RAM 16 x 8')

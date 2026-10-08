@@ -10,9 +10,9 @@
 #                      enable load at the end of the phase
 #
 # computeSignals(cpu) works out the value on every wire and control line
-# for the phase that is about to run, WITHOUT changing cpu (like
-# traceInstruction in ../datapath.py). stepPhase(cpu) computes those signals
-# and then commits them, the way the clock edge would.
+# for the phase that is about to run, WITHOUT changing cpu. stepPhase(cpu)
+# computes those signals and then commits them, the way the clock edge
+# would.
 #
 # The logic is built from gates (notGate, andGate, ...) and full adders, so
 # every intermediate bit can be shown to the learner. No graphics here.

@@ -5,8 +5,8 @@
 # The small read-only helpers here (panel rectangles, property rows) are
 # also used by zb_main.py to know what was clicked.
 #
-# Shapes are adapted from ../z18100/z18_view.py; here they take a part
-# dict (and the camera) instead of the fixed lecture layout.
+# Each shape takes a part dict (and the camera), so any part can be drawn
+# anywhere on the canvas.
 
 import math
 from types import SimpleNamespace
@@ -34,7 +34,7 @@ FONT = 'monospace'
 WINDOW_WIDTH = DESIGN_WIDTH            # the layout's size in design units
 WINDOW_HEIGHT = DESIGN_HEIGHT          # (zb_paint scales it to the window)
 
-# Colors (the palette of ../z18100/z18_view.py)
+# Colors
 BG_COLOR = rgb(24, 26, 32)
 CANVAS_COLOR = rgb(28, 30, 37)
 GRID_COLOR = rgb(44, 48, 59)

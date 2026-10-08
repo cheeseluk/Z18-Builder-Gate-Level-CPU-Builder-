@@ -1,7 +1,7 @@
 # zb_paint.py
 # Every picture the builder draws goes through the five functions here.
-# They have the same names and arguments as the old scaled_draw.py (design
-# units, sharp on scaled displays), so zb_view.py never calls the graphics
+# They take design units and stay sharp on scaled displays, and they are
+# the only way anything is drawn, so zb_view.py never calls the graphics
 # library directly, and swapping the library means changing only this file.
 #
 # Two backends draw the same picture:

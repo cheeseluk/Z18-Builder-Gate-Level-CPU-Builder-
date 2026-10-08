@@ -8,9 +8,10 @@
 #   controller: zb_editor.py (Build-mode actions) and this file (setup,
 #               Build/Run modes, the wave animation, events)
 #
-# As in ../z18100/z18_main.py, only the clock edge (zb_sim.endPhase)
-# changes the machine. Each phase is settled first (zb_sim.beginPhase);
-# the animation then replays its waves, and the edge commits it.
+# As in the golden model (z18_cpu.stepPhase), only the clock edge
+# (zb_sim.endPhase) changes the machine. Each phase is settled first
+# (zb_sim.beginPhase); the animation then replays its waves, and the edge
+# commits it.
 
 import os
 import sys
