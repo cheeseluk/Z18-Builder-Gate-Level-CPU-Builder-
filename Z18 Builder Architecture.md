@@ -21,6 +21,7 @@ Z18 Builder is a teaching app for CMU 18-100's Z18100, an 8-bit CPU with 16 word
 11. [Controller and view](#11-controller-and-view)
 12. [Persistence and caching](#12-persistence-and-caching)
 13. [Module index](#13-module-index)
+14. [Full import graph](#14-full-import-graph)
 
 ## 1. Layers and who imports whom
 
@@ -35,13 +36,8 @@ flowchart TB
         editor[zb_editor]
     end
     subgraph MODEL["Model: pure data and logic"]
-        missions[zb_missions] --> kit[zb_kit]
-        missions --> library[zb_library]
-        library --> sim[zb_sim] --> circuit[zb_circuit] --> parts[zb_parts] --> values[zb_values]
-        kit -.-> library
-        kit --> sim
-        kit -.-> explain[zb_explain]
-        sim <-.-> explain
+        missions[zb_missions] --> kit[zb_kit] --> library[zb_library] --> sim[zb_sim] --> circuit[zb_circuit] --> parts[zb_parts] --> values[zb_values]
+        kit --> explain[zb_explain]
         route[zb_route] --> circuit
     end
     subgraph SHARED["Shared helpers, no graphics"]
@@ -53,25 +49,16 @@ flowchart TB
     end
     main --> editor
     view --> editor
-    editor --> kit
-    editor --> library
-    editor -.-> missions
-    editor -.-> route
+    editor --> missions
+    editor --> route
     paint --> helpers
-    view --> helpers
-    editor --> helpers
-    main --> cpu
-    main --> asm
-    main --> isa
-    view --> asm
+    sim -.->|"stop details, imported inside a function"| explain
     parts --> cpu
     kit --> cpu
-    kit --> asm
-    missions --> asm
     explain --> asm
 ```
 
-**Arrows point from the importer to the module it imports, and at module level they only point down:** graphics, then controller, then model, then lecture code. Solid arrows are imports at the top of the file; dotted arrows are imports inside a function. Not every import is drawn: `zb_main` and `zb_view` read from most of the model, and an arrow already implied by a longer path is left out. The one loop, between `zb_sim` and `zb_explain`, is made of imports inside functions on both sides, so neither module needs the other to load. `zb_helpers` (display scaling and polyline geometry) imports nothing from the builder, so any layer may use it.
+**Arrows point from the importer to the module it imports, and at module level they only point down:** graphics, then controller, then model, then lecture code. Not every import is drawn: `zb_main` and `zb_view` read from most of the model, and `zb_main` calls `z18_assembler` to load the chosen program. The one loop, between `zb_sim` and `zb_explain`, is made of imports inside functions on both sides, so neither module needs the other to load. `zb_helpers` (display scaling and polyline geometry) imports nothing from the builder, so any layer may use it. For every import, drawn exactly, see [the full import graph](#14-full-import-graph).
 
 The builder reaches `z18100/` by appending it to `sys.path` (at the top of `zb_parts`, `zb_kit`, `zb_main` and `test_zb`). It never modifies those files. The style is the same throughout: no classes, camelCase names, a short comment on every function, and `#####` section banners.
 
@@ -318,3 +305,58 @@ Anything expensive is computed once per edit, never once per frame.
 | `test_zb.py` | 2,528 | 73 tests, run without a window: `python z18builder/test_zb.py` |
 
 `z18100/z18100_cpu_spec.md` is the written specification of the Z18100 that the golden model and the lecture check's explanations follow.
+
+## 14. Full import graph
+
+This is the diagram from [section 1](#1-layers-and-who-imports-whom) with every import between modules drawn. Solid arrows are imports at the top of the file; dotted arrows are imports inside a function. An arrow already implied by a longer path of solid arrows is left out, and so are the many model modules `zb_main` and `zb_view` read from directly.
+
+```mermaid
+flowchart TB
+    subgraph GFX["Imports cmu_graphics"]
+        main[zb_main] --> view[zb_view] --> paint[zb_paint]
+    end
+    subgraph CTRL["Controller, no drawing"]
+        editor[zb_editor]
+    end
+    subgraph MODEL["Model: pure data and logic"]
+        missions[zb_missions] --> kit[zb_kit]
+        missions --> library[zb_library]
+        library --> sim[zb_sim] --> circuit[zb_circuit] --> parts[zb_parts] --> values[zb_values]
+        kit -.-> library
+        kit --> sim
+        kit -.-> explain[zb_explain]
+        sim <-.-> explain
+        route[zb_route] --> circuit
+    end
+    subgraph SHARED["Shared helpers, no graphics"]
+        helpers[zb_helpers]
+    end
+    subgraph LECTURE["z18100/: lecture code, read-only"]
+        asm[z18_assembler] --> isa[z18_isa]
+        cpu[z18_cpu] --> isa
+    end
+    main --> editor
+    view --> editor
+    editor --> kit
+    editor --> library
+    editor -.-> missions
+    editor -.-> route
+    paint --> helpers
+    view --> helpers
+    editor --> helpers
+    main --> cpu
+    main --> asm
+    main --> isa
+    view --> asm
+    parts --> cpu
+    kit --> cpu
+    kit --> asm
+    missions --> asm
+    explain --> asm
+```
+
+Three things this shows that section 1 leaves out:
+
+- **The graphics layer imports lecture code directly**: `zb_main` imports `z18_cpu`, `z18_assembler` and `z18_isa`, and `zb_view` imports `z18_assembler`.
+- **Several imports happen inside functions**: `zb_kit` loads `zb_library` and `zb_explain` only when needed, and `zb_editor` does the same for `zb_missions` and `zb_route`.
+- **`zb_helpers` is used by three layers**: `zb_paint`, `zb_view` and `zb_editor`.
