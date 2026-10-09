@@ -17,3 +17,5 @@ z18100/LEARNING_*.py
 z18builder/circuits/My SR Latch.json
 z18builder/circuits/SR latch.json
 z18builder/circuits/D Latch.json
+z18builder/circuits/demo cpu.json
+z18builder/circuits/error cpu.json
