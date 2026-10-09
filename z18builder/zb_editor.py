@@ -29,7 +29,7 @@ MIN_ZOOM, MAX_ZOOM = 0.25, 2.5
 PORT_HIT = 6                    # screen distance to grab a port
 WIRE_HIT = 5
 MAX_UNDO = 100
-USER_SHAPES = ['box']                 # your parts are boxes (Round 3)
+USER_SHAPES = ['box']                 
 
 # The speed dial of the Run-mode animation. 1x is 14 frames per wave;
 # the slowest steps (0.15x down to 0.05x, about 1.6-4.7 s per wave) are

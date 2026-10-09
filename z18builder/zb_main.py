@@ -11,6 +11,7 @@
 # As in the golden model (z18_cpu.stepPhase), only the clock edge
 # (zb_sim.endPhase) changes the machine. Each phase is settled first
 # (zb_sim.beginPhase); the animation then replays its waves, and the edge
+# commits the new state. The lecture check (zb_kit) compares the machine
 
 import os
 import sys
