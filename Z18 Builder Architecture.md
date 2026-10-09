@@ -35,9 +35,16 @@ flowchart TB
         editor[zb_editor]
     end
     subgraph MODEL["Model: pure data and logic"]
-        missions[zb_missions] --> kit[zb_kit] --> library[zb_library] --> sim[zb_sim] --> circuit[zb_circuit] --> parts[zb_parts] --> values[zb_values]
-        kit --> explain[zb_explain]
+        missions[zb_missions] --> kit[zb_kit]
+        missions --> library[zb_library]
+        library --> sim[zb_sim] --> circuit[zb_circuit] --> parts[zb_parts] --> values[zb_values]
+        kit -.-> library
+        kit --> sim
+        kit -.-> explain[zb_explain]
+        sim <-.-> explain
         route[zb_route] --> circuit
+    end
+    subgraph SHARED["Shared helpers, no graphics"]
         helpers[zb_helpers]
     end
     subgraph LECTURE["z18100/: lecture code, read-only"]
@@ -46,16 +53,25 @@ flowchart TB
     end
     main --> editor
     view --> editor
-    editor --> missions
-    editor --> route
+    editor --> kit
+    editor --> library
+    editor -.-> missions
+    editor -.-> route
     paint --> helpers
-    sim -.->|"stop details, imported inside a function"| explain
+    view --> helpers
+    editor --> helpers
+    main --> cpu
+    main --> asm
+    main --> isa
+    view --> asm
     parts --> cpu
     kit --> cpu
+    kit --> asm
+    missions --> asm
     explain --> asm
 ```
 
-**Arrows point from the importer to the module it imports, and at module level they only point down:** graphics, then controller, then model, then lecture code. Not every import is drawn: `zb_main` and `zb_view` read from most of the model, and `zb_main` calls `z18_assembler` to load the chosen program. The one loop, between `zb_sim` and `zb_explain`, is made of imports inside functions on both sides, so neither module needs the other to load.
+**Arrows point from the importer to the module it imports, and at module level they only point down:** graphics, then controller, then model, then lecture code. Solid arrows are imports at the top of the file; dotted arrows are imports inside a function. Not every import is drawn: `zb_main` and `zb_view` read from most of the model, and an arrow already implied by a longer path is left out. The one loop, between `zb_sim` and `zb_explain`, is made of imports inside functions on both sides, so neither module needs the other to load. `zb_helpers` (display scaling and polyline geometry) imports nothing from the builder, so any layer may use it.
 
 The builder reaches `z18100/` by appending it to `sys.path` (at the top of `zb_parts`, `zb_kit`, `zb_main` and `test_zb`). It never modifies those files. The style is the same throughout: no classes, camelCase names, a short comment on every function, and `#####` section banners.
 
